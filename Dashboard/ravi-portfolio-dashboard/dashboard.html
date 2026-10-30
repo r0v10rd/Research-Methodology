@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Developer Dashboard - Ravi Ardhana</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23a855f7'/><text y='65' font-size='50' x='50' text-anchor='middle' fill='white'>R</text></svg>">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Interactive Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #000021; }
+        ::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 4px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000021;
+            color: #e5e7eb;
+        }
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .nav-item.active {
+            background-color: rgba(168, 85, 247, 0.18);
+            color: #ffffff;
+            border-left: 4px solid #a855f7;
+        }
+        .glass-card {
+            background-color: #12123e;
+            border: 1px solid #1f2937;
+        }
+        .glass-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+        /* Custom modal transition */
+        .modal-active {
+            display: flex !important;
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-purple-900 selection:text-white">
+
+    <!-- Mobile Top Bar -->
+    <div class="md:hidden flex items-center justify-between bg-[#12123e] border-b border-gray-800 p-4 sticky top-0 z-50">
+        <div class="flex items-center space-x-2.5">
+            <span class="w-3 h-3 rounded-full bg-[#a855f7] shadow-lg shadow-purple-500"></span>
+            <span class="font-bold text-white text-base">Ravi Dashboard</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="openQuickLeetCodeModal()" class="px-2.5 py-1 bg-green-950/70 text-green-300 border border-green-800/60 rounded text-xs font-semibold">
+                + LC
+            </button>
+            <button id="mobileMenuToggle" class="p-2 text-gray-300 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-full md:w-64 bg-[#0a0a28] border-r border-gray-800 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0 z-40">
+        <div>
+            <!-- Brand / Logo -->
+            <div class="p-6 border-b border-gray-800/80">
+                <div class="flex items-center space-x-2.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#a855f7] shadow-lg shadow-purple-500 ring-4 ring-purple-900/40"></span>
+                    <div>
+                        <h1 class="font-extrabold text-white text-lg tracking-tight">Ravi Ardhana</h1>
+                        <p class="text-xs text-purple-400 font-medium">Developer OS & Analytics</p>
+                    </div>
+                </div>
+                <!-- Connection Status Badge -->
+                <div id="connectionStatusBadge" class="mt-4 flex items-center space-x-2 px-2.5 py-1 rounded-md bg-purple-950/40 border border-purple-800/40 text-[11px] text-purple-300">
+                    <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
+                    <span id="connectionStatusText">Checking storage...</span>
+                </div>
+            </div>
+
+            <!-- Nav Links -->
+            <nav class="p-4 space-y-1.5">
+                <button onclick="switchTab('overview')" id="tab-btn-overview" class="nav-item active w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">📊</span>
+                        <span>Overview & Analytics</span>
+                    </div>
+                </button>
+
+                <button onclick="switchTab('projects')" id="tab-btn-projects" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">💼</span>
+                        <span>Projects & Timeline</span>
+                    </div>
+                    <span id="badgeProjectCount" class="text-xs bg-purple-950 text-purple-300 px-2 py-0.5 rounded-full border border-purple-800/50">0</span>
+                </button>
+
+                <button onclick="switchTab('skills')" id="tab-btn-skills" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">⚡</span>
+                        <span>Skills & Duration</span>
+                    </div>
+                    <span id="badgeSkillCount" class="text-xs bg-purple-950 text-purple-300 px-2 py-0.5 rounded-full border border-purple-800/50">0</span>
+                </button>
+
+                <button onclick="switchTab('topics')" id="tab-btn-topics" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">🎯</span>
+                        <span>Roadmap & Concepts</span>
+                    </div>
+                    <span id="badgeTopicCount" class="text-xs bg-amber-950 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-800/50">0</span>
+                </button>
+
+                <button onclick="switchTab('leetcode')" id="tab-btn-leetcode" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">💻</span>
+                        <span>LeetCode Solves</span>
+                    </div>
+                    <span id="badgeLeetCodeCount" class="text-xs bg-green-950 text-green-300 font-bold px-2 py-0.5 rounded-full border border-green-800/50">0</span>
+                </button>
+
+                <button onclick="switchTab('messages')" id="tab-btn-messages" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">✉️</span>
+                        <span>Inquiries & Leads</span>
+                    </div>
+                    <span id="badgeMessageCount" class="text-xs bg-red-950 text-red-400 font-bold px-2 py-0.5 rounded-full border border-red-800/50">0</span>
+                </button>
+
+                <button onclick="switchTab('settings')" id="tab-btn-settings" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">⚙️</span>
+                        <span>Profile & Bio</span>
+                    </div>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-gray-800/80 space-y-2">
+            <button onclick="openAddLeetCodeModal()" class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-green-950/60 hover:bg-green-900 text-green-300 text-xs font-semibold border border-green-800/60 transition">
+                <span>+ Log LeetCode Solve</span>
+            </button>
+            <a href="index.html" target="_blank" class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-[#12123e] hover:bg-[#a855f7] hover:text-white text-purple-300 text-xs font-semibold border border-purple-900/60 transition">
+                <span>View Public Portfolio</span>
+                <span>↗</span>
+            </a>
+            <div class="flex space-x-2 pt-1">
+                <button onclick="exportDataBackup()" class="flex-1 text-[11px] py-1.5 px-2 bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-gray-200 rounded border border-gray-800 text-center transition">
+                    Export JSON
+                </button>
+                <button onclick="resetDataPrompt()" class="text-[11px] py-1.5 px-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 rounded border border-red-900/50 text-center transition" title="Reset all data to initial defaults">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+
+        <!-- Top Header Bar inside Main -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-800 mb-8">
+            <div>
+                <h2 id="pageTitle" class="text-2xl md:text-3xl font-extrabold text-white">Dashboard Overview</h2>
+                <p id="pageSubtitle" class="text-sm text-gray-400 mt-1">Real-time metrics, project timelines, skill completion, upcoming concepts roadmap, and LeetCode analytics.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openQuickLeetCodeModal()" class="px-3.5 py-2 bg-green-950/60 hover:bg-green-900/80 text-green-300 rounded-lg border border-green-800/60 text-xs font-semibold flex items-center space-x-1.5 transition">
+                    <span>⚡</span>
+                    <span>Quick Solve</span>
+                </button>
+                <button onclick="refreshDashboard()" class="px-3.5 py-2 bg-[#12123e] hover:bg-purple-950/60 text-purple-300 rounded-lg border border-purple-900/50 text-xs font-medium flex items-center space-x-1.5 transition">
+                    <span>↻</span>
+                    <span>Refresh</span>
+                </button>
+                <a href="index.html" class="px-4 py-2 bg-[#a855f7] hover:bg-purple-600 text-white rounded-lg text-xs font-semibold shadow-lg shadow-purple-900/50 transition flex items-center space-x-1.5">
+                    <span>Live Portfolio</span>
+                    <span>↗</span>
+                </a>
+            </div>
+        </header>
+
+
+        <!-- ================= TAB 1: OVERVIEW ================= -->
+        <section id="tab-overview" class="space-y-8">
+            <!-- Metric KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- LeetCode KPI Card -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden cursor-pointer hover:border-green-500/50 transition" onclick="switchTab('leetcode')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-green-400 uppercase tracking-wider">LeetCode Solved</p>
+                            <h3 id="statTotalLeetCode" class="text-3xl font-black text-white mt-1">165</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-green-950/60 border border-green-800/40 flex items-center justify-center text-xl">
+                            💻
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap items-center gap-1.5 text-xs text-gray-300">
+                        <span class="text-green-400 font-bold" id="statLcTodayBadge">Today: 3</span>
+                        <span class="text-gray-600">•</span>
+                        <span class="text-yellow-400 font-medium" id="statLcWeekBadge">Week: 18</span>
+                        <span class="text-gray-600">•</span>
+                        <span class="text-purple-300 font-medium" id="statLcMonthBadge">Month: 64</span>
+                    </div>
+                    <div class="mt-2 text-[11px] text-orange-400 font-semibold flex items-center space-x-1">
+                        <span id="statLcStreakBadge">🔥 14-Day Active Streak</span>
+                    </div>
+                </div>
+
+                <!-- Projects & Timeline KPI -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden cursor-pointer hover:border-purple-500/50 transition" onclick="switchTab('projects')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Projects Completed</p>
+                            <h3 id="statTotalProjects" class="text-3xl font-black text-white mt-1">5</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-800/40 flex items-center justify-center text-xl">
+                            💼
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-xs text-purple-300 font-medium">
+                        <span id="statProjectsLive">4 Completed</span>
+                        <span class="text-gray-500 mx-1">•</span>
+                        <span id="statProjectsProgress">1 In Progress</span>
+                    </div>
+                    <div class="mt-2 text-[11px] text-gray-400">
+                        <span id="statAvgProjectDuration">⏱️ Avg Duration: 4.1 weeks</span>
+                    </div>
+                </div>
+
+                <!-- Skills & Learning Duration KPI -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden cursor-pointer hover:border-blue-500/50 transition" onclick="switchTab('skills')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Skills Mastered</p>
+                            <h3 id="statTotalSkills" class="text-3xl font-black text-white mt-1">7</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-800/40 flex items-center justify-center text-xl">
+                            ⚡
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-xs text-blue-300 font-medium">
+                        <span id="statAvgSkillLevel">Avg Proficiency: 85%</span>
+                    </div>
+                    <div class="mt-2 text-[11px] text-gray-400">
+                        <span id="statTotalLearningDuration">⏱️ Total Learning: ~23 Months</span>
+                    </div>
+                </div>
+
+                <!-- To-Do Concepts Linked to Skills KPI -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden cursor-pointer hover:border-amber-500/50 transition" onclick="switchTab('topics')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider">To-Do Concepts</p>
+                            <h3 id="statTotalTopics" class="text-3xl font-black text-white mt-1">7</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/40 flex items-center justify-center text-xl">
+                            🎯
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-xs text-amber-300 font-medium">
+                        <span id="statTopicsPending">6 Pending / Soon</span>
+                        <span class="text-gray-500 mx-1">•</span>
+                        <span id="statTopicsMastered">1 Mastered</span>
+                    </div>
+                    <div class="mt-2 text-[11px] text-red-400 font-medium">
+                        <span id="statTopicsHighPriority">4 High Priority Queued</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1: LeetCode Trends & Difficulty -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- LeetCode Interactive Solves Chart -->
+                <div class="lg:col-span-8 glass-card p-6 rounded-2xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                                <h4 class="text-lg font-bold text-white">LeetCode Problems Solved Trend</h4>
+                            </div>
+                            <p id="lcChartSubtitle" class="text-xs text-gray-400 mt-0.5">Problems solved per day (Last 14 days)</p>
+                        </div>
+                        <!-- Granularity Selector: Day / Week / Month -->
+                        <div class="inline-flex rounded-lg bg-[#000021] p-1 border border-gray-800 text-xs">
+                            <button id="btnLcDay" onclick="setOverviewLcTimeframe('day')" class="px-3 py-1.5 rounded-md font-semibold bg-[#a855f7] text-white transition">
+                                Per Day
+                            </button>
+                            <button id="btnLcWeek" onclick="setOverviewLcTimeframe('week')" class="px-3 py-1.5 rounded-md font-medium text-gray-400 hover:text-white transition">
+                                Per Week
+                            </button>
+                            <button id="btnLcMonth" onclick="setOverviewLcTimeframe('month')" class="px-3 py-1.5 rounded-md font-medium text-gray-400 hover:text-white transition">
+                                Per Month
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative h-64 md:h-72 w-full">
+                        <canvas id="overviewLeetCodeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Difficulty Split Doughnut -->
+                <div class="lg:col-span-4 glass-card p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-lg font-bold text-white">Difficulty Breakdown</h4>
+                            <span class="text-xs text-purple-300 font-semibold cursor-pointer" onclick="switchTab('leetcode')">View Hub →</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Proportion of Easy, Medium, and Hard challenges solved.</p>
+                        <div class="relative h-52 w-full flex items-center justify-center">
+                            <canvas id="overviewDifficultyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-4 border-t border-gray-800 text-center text-xs">
+                        <div class="p-2 rounded bg-green-950/30 border border-green-800/40">
+                            <span class="text-green-400 font-bold block text-sm" id="donutEasyCount">0</span>
+                            <span class="text-gray-400 text-[11px]">Easy</span>
+                        </div>
+                        <div class="p-2 rounded bg-amber-950/30 border border-amber-800/40">
+                            <span class="text-amber-400 font-bold block text-sm" id="donutMediumCount">0</span>
+                            <span class="text-gray-400 text-[11px]">Medium</span>
+                        </div>
+                        <div class="p-2 rounded bg-red-950/30 border border-red-800/40">
+                            <span class="text-red-400 font-bold block text-sm" id="donutHardCount">0</span>
+                            <span class="text-gray-400 text-[11px]">Hard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2: Projects Duration & Skills Duration -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Projects Completion Timeline Bar Chart -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-white">Project Completion Duration</h4>
+                            <p class="text-xs text-gray-400">How long each project took to build & ship</p>
+                        </div>
+                        <button onclick="openAddProjectModal()" class="text-xs text-[#a855f7] hover:underline font-semibold">+ Add Project</button>
+                    </div>
+                    <div class="relative h-60 w-full">
+                        <canvas id="projectDurationChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Skill Learning Duration Bar Chart -->
+                <div class="lg:col-span-6 glass-card p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-white">Skills & Learning Duration</h4>
+                            <p class="text-xs text-gray-400">Time invested to achieve current proficiency</p>
+                        </div>
+                        <button onclick="openAddSkillModal()" class="text-xs text-[#a855f7] hover:underline font-semibold">+ Add Skill</button>
+                    </div>
+                    <div class="relative h-60 w-full">
+                        <canvas id="skillsDurationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & Roadmap Peek -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Upcoming Concepts Quick Peek -->
+                <div class="lg:col-span-7 glass-card p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">🎯</span>
+                            <h4 class="text-lg font-bold text-white">Upcoming Concepts to Cover Soon</h4>
+                        </div>
+                        <button onclick="switchTab('topics')" class="text-xs text-[#a855f7] hover:underline font-semibold">Manage Roadmap →</button>
+                    </div>
+                    <div id="overviewUpcomingTopics" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="lg:col-span-5 glass-card p-6 rounded-2xl">
+                    <h4 class="text-lg font-bold text-white mb-4">Quick Management Actions</h4>
+                    <div class="space-y-3">
+                        <button onclick="openAddLeetCodeModal()" class="w-full text-left p-3 rounded-xl bg-[#000021] border border-gray-800 hover:border-green-500 transition flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xl">💻</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-white group-hover:text-green-300">Log LeetCode Problem</p>
+                                    <p class="text-xs text-gray-400">Track solves for today, time taken, & approach</p>
+                                </div>
+                            </div>
+                            <span class="text-green-400 font-bold">+</span>
+                        </button>
+
+                        <button onclick="openAddProjectModal()" class="w-full text-left p-3 rounded-xl bg-[#000021] border border-gray-800 hover:border-[#a855f7] transition flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xl">💼</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-white group-hover:text-purple-300">Add Project with Timeline</p>
+                                    <p class="text-xs text-gray-400">Specify completion duration and milestone dates</p>
+                                </div>
+                            </div>
+                            <span class="text-purple-400 font-bold">+</span>
+                        </button>
+
+                        <button onclick="openAddSkillModal()" class="w-full text-left p-3 rounded-xl bg-[#000021] border border-gray-800 hover:border-[#a855f7] transition flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xl">⚡</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-white group-hover:text-purple-300">Add Technical Skill & Duration</p>
+                                    <p class="text-xs text-gray-400">Record learning duration & proficiency</p>
+                                </div>
+                            </div>
+                            <span class="text-purple-400 font-bold">+</span>
+                        </button>
+
+                        <button onclick="openAddTopicModal()" class="w-full text-left p-3 rounded-xl bg-[#000021] border border-gray-800 hover:border-amber-500 transition flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xl">🎯</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-white group-hover:text-amber-300">Add To-Do Topic for Skill</p>
+                                    <p class="text-xs text-gray-400">Queue next concepts to master by target date</p>
+                                </div>
+                            </div>
+                            <span class="text-amber-400 font-bold">+</span>
+                        </button>
+
+                        <button onclick="switchTab('settings')" class="w-full text-left p-3 rounded-xl bg-[#000021] border border-gray-800 hover:border-purple-400 transition flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xl">✏️</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-white group-hover:text-purple-300">Edit Bio & Target Objectives</p>
+                                    <p class="text-xs text-gray-400">Update developer narrative & social links</p>
+                                </div>
+                            </div>
+                            <span class="text-purple-400 font-bold">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 2: PROJECTS MANAGER ================= -->
+        <section id="tab-projects" class="hidden space-y-6">
+            <!-- Header bar with search & filters -->
+            <div class="bg-[#12123e] p-6 rounded-2xl border border-gray-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-white">Projects & Timeline Tracker</h3>
+                    <p class="text-xs text-gray-400 mt-1">Track projects, milestone timelines, and exactly how long each took to complete.</p>
+                </div>
+                <button onclick="openAddProjectModal()" class="px-4 py-2.5 bg-[#a855f7] hover:bg-purple-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-purple-900/50 transition flex items-center space-x-2">
+                    <span>+ Add New Project</span>
+                </button>
+            </div>
+
+            <!-- Filter & Sort Bar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#0a0a28] p-4 rounded-xl border border-gray-800/80">
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <input type="text" id="projectSearchInput" oninput="filterProjectsList()" placeholder="Search projects or tech tags..." class="bg-[#000021] border border-gray-700 rounded-lg px-3.5 py-1.5 text-xs text-white focus:border-[#a855f7] outline-none w-full sm:w-64">
+                    <select id="projectCategoryFilter" onchange="filterProjectsList()" class="bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:border-[#a855f7] outline-none">
+                        <option value="All">All Categories</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend/Logic">Backend/Logic</option>
+                        <option value="Fullstack">Fullstack</option>
+                        <option value="Utility">Utility</option>
+                    </select>
+                    <select id="projectStatusFilter" onchange="filterProjectsList()" class="bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:border-[#a855f7] outline-none">
+                        <option value="All">All Statuses</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Progress">In Progress</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <span class="text-xs text-gray-400">Sort:</span>
+                    <select id="projectSortFilter" onchange="filterProjectsList()" class="bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:border-[#a855f7] outline-none">
+                        <option value="newest">Recently Added</option>
+                        <option value="duration-desc">Duration (Longest first)</option>
+                        <option value="duration-asc">Duration (Shortest first)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="dashboardProjectsList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 3: SKILLS & DURATION MANAGER ================= -->
+        <section id="tab-skills" class="hidden space-y-6">
+            <div class="bg-[#12123e] p-6 rounded-2xl border border-gray-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-white">Technical Skills & Learning Duration</h3>
+                    <p class="text-xs text-gray-400 mt-1">Manage technical capabilities, proficiency scores, and how long it took to master each skill.</p>
+                </div>
+                <button onclick="openAddSkillModal()" class="px-4 py-2.5 bg-[#a855f7] hover:bg-purple-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-purple-900/50 transition flex items-center space-x-2">
+                    <span>+ Add New Skill</span>
+                </button>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex flex-wrap items-center gap-2" id="skillCategoryFilterPills">
+                <button onclick="setSkillFilter('All')" class="skill-cat-btn active px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#a855f7] text-white">All Skills</button>
+                <button onclick="setSkillFilter('Frontend Core')" class="skill-cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#12123e] text-gray-300 hover:text-white">Frontend Core</button>
+                <button onclick="setSkillFilter('Backend/Logic')" class="skill-cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#12123e] text-gray-300 hover:text-white">Backend/Logic</button>
+                <button onclick="setSkillFilter('Algorithms')" class="skill-cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#12123e] text-gray-300 hover:text-white">Algorithms & DS</button>
+                <button onclick="setSkillFilter('Tools')" class="skill-cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#12123e] text-gray-300 hover:text-white">Tools & DevOps</button>
+                <button onclick="setSkillFilter('Database')" class="skill-cat-btn px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#12123e] text-gray-300 hover:text-white">Database</button>
+            </div>
+
+            <!-- Skills Grid -->
+            <div id="dashboardSkillsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 4: ROADMAP & TO-DO TOPICS (RELATED TO SKILLS) ================= -->
+        <section id="tab-topics" class="hidden space-y-6">
+            <div class="bg-[#12123e] p-6 rounded-2xl border border-gray-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-white">Roadmap: To-Do Topics & Concepts</h3>
+                    <p class="text-xs text-gray-400 mt-1">Concepts and topics to cover soon, dynamically linked to your technical skills.</p>
+                </div>
+                <button onclick="openAddTopicModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-lg shadow-lg shadow-amber-500/20 transition flex items-center space-x-2">
+                    <span>+ Add Topic / Concept</span>
+                </button>
+            </div>
+
+            <!-- Summary KPI Strip for Topics -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="text-xs text-gray-400 block font-medium">Total Queued</span>
+                    <span id="topicKpiTotal" class="text-2xl font-black text-white mt-0.5 block">7</span>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="text-xs text-blue-400 block font-medium">In Progress</span>
+                    <span id="topicKpiInProgress" class="text-2xl font-black text-blue-300 mt-0.5 block">2</span>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="text-xs text-red-400 block font-medium">High Priority</span>
+                    <span id="topicKpiHighPriority" class="text-2xl font-black text-red-300 mt-0.5 block">4</span>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="text-xs text-green-400 block font-medium">Mastered</span>
+                    <span id="topicKpiMastered" class="text-2xl font-black text-green-300 mt-0.5 block">1</span>
+                </div>
+            </div>
+
+            <!-- Filter Bar for Topics -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0a0a28] p-4 rounded-xl border border-gray-800">
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <input type="text" id="topicSearchInput" oninput="filterTopicsList()" placeholder="Search concepts or notes..." class="bg-[#000021] border border-gray-700 rounded-lg px-3.5 py-1.5 text-xs text-white focus:border-amber-400 outline-none w-full sm:w-56">
+                    
+                    <!-- Linked Skill Selector Filter -->
+                    <select id="topicSkillFilter" onchange="filterTopicsList()" class="bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:border-amber-400 outline-none">
+                        <option value="All">All Linked Skills</option>
+                        <!-- Populated by JS -->
+                    </select>
+
+                    <select id="topicStatusFilter" onchange="filterTopicsList()" class="bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:border-amber-400 outline-none">
+                        <option value="All">All Statuses</option>
+                        <option value="To Do">To Do</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Mastered">Mastered</option>
+                    </select>
+
+                    <select id="topicPriorityFilter" onchange="filterTopicsList()" class="bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:border-amber-400 outline-none">
+                        <option value="All">All Priorities</option>
+                        <option value="High">High Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Topics Grid / Cards -->
+            <div id="dashboardTopicsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Per-Skill Concept Progress Meter -->
+            <div class="glass-card p-6 rounded-2xl space-y-4">
+                <h4 class="text-base font-bold text-white">Roadmap Completion by Technical Skill</h4>
+                <div id="skillTopicProgressBars" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 5: LEETCODE PROBLEMS TRACKER ================= -->
+        <section id="tab-leetcode" class="hidden space-y-6">
+            <!-- Header with Quick Solved Bar -->
+            <div class="bg-[#12123e] p-6 rounded-2xl border border-gray-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-green-400"></span>
+                        <h3 class="text-xl font-bold text-white">LeetCode Problems Solved Hub</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Granular tracking of solved problems per day, per week, and per month with approach notes and difficulty splits.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="quickLogSolve('Easy')" class="px-3 py-2 bg-green-950/70 hover:bg-green-900 text-green-300 text-xs font-semibold rounded-lg border border-green-800/60 transition">
+                        + Easy
+                    </button>
+                    <button onclick="quickLogSolve('Medium')" class="px-3 py-2 bg-amber-950/70 hover:bg-amber-900 text-amber-300 text-xs font-semibold rounded-lg border border-amber-800/60 transition">
+                        + Medium
+                    </button>
+                    <button onclick="quickLogSolve('Hard')" class="px-3 py-2 bg-red-950/70 hover:bg-red-900 text-red-300 text-xs font-semibold rounded-lg border border-red-800/60 transition">
+                        + Hard
+                    </button>
+                    <button onclick="openAddLeetCodeModal()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-slate-950 text-xs font-bold rounded-lg shadow-lg shadow-green-500/20 transition">
+                        + Log Problem Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Granular LeetCode KPIs -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <!-- Solved Today -->
+                <div class="glass-card p-4 rounded-xl text-center relative overflow-hidden">
+                    <span class="text-xs text-green-400 block font-semibold uppercase tracking-wider">Solved Today</span>
+                    <span id="lcCardToday" class="text-3xl font-black text-white mt-1 block">3</span>
+                    <span class="text-[11px] text-gray-400 mt-1 block" id="lcCardTodayGoal">Goal: 2 / day</span>
+                </div>
+
+                <!-- Solved This Week -->
+                <div class="glass-card p-4 rounded-xl text-center relative overflow-hidden">
+                    <span class="text-xs text-yellow-400 block font-semibold uppercase tracking-wider">This Week</span>
+                    <span id="lcCardWeek" class="text-3xl font-black text-white mt-1 block">18</span>
+                    <span class="text-[11px] text-gray-400 mt-1 block" id="lcCardWeekGoal">Goal: 14 / wk</span>
+                </div>
+
+                <!-- Solved This Month -->
+                <div class="glass-card p-4 rounded-xl text-center relative overflow-hidden">
+                    <span class="text-xs text-purple-400 block font-semibold uppercase tracking-wider">This Month</span>
+                    <span id="lcCardMonth" class="text-3xl font-black text-white mt-1 block">64</span>
+                    <span class="text-[11px] text-gray-400 mt-1 block" id="lcCardMonthGoal">Goal: 50 / mo</span>
+                </div>
+
+                <!-- Total Solved -->
+                <div class="glass-card p-4 rounded-xl text-center relative overflow-hidden">
+                    <span class="text-xs text-blue-400 block font-semibold uppercase tracking-wider">Total Solved</span>
+                    <span id="lcCardTotal" class="text-3xl font-black text-white mt-1 block">165</span>
+                    <span class="text-[11px] text-gray-400 mt-1 block">Target: 300</span>
+                </div>
+
+                <!-- Active Streak -->
+                <div class="glass-card p-4 rounded-xl text-center relative overflow-hidden col-span-2 sm:col-span-1">
+                    <span class="text-xs text-orange-400 block font-semibold uppercase tracking-wider">Active Streak</span>
+                    <span id="lcCardStreak" class="text-3xl font-black text-orange-400 mt-1 block">🔥 14</span>
+                    <span class="text-[11px] text-gray-400 mt-1 block">Days in a row</span>
+                </div>
+            </div>
+
+            <!-- Dedicated Chart Section with Day / Week / Month Switcher -->
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h4 id="lcDedicatedChartTitle" class="text-lg font-bold text-white">Daily Solves Activity (Past 14 Days)</h4>
+                        <p id="lcDedicatedChartSubtitle" class="text-xs text-gray-400">Shows daily solved counts split by difficulty level</p>
+                    </div>
+                    <div class="inline-flex rounded-lg bg-[#000021] p-1 border border-gray-800 text-xs">
+                        <button id="btnLcHubDay" onclick="setDedicatedLcTimeframe('day')" class="px-3.5 py-1.5 rounded-md font-semibold bg-green-500 text-slate-950 transition">
+                            📅 Per Day
+                        </button>
+                        <button id="btnLcHubWeek" onclick="setDedicatedLcTimeframe('week')" class="px-3.5 py-1.5 rounded-md font-medium text-gray-400 hover:text-white transition">
+                            📆 Per Week
+                        </button>
+                        <button id="btnLcHubMonth" onclick="setDedicatedLcTimeframe('month')" class="px-3.5 py-1.5 rounded-md font-medium text-gray-400 hover:text-white transition">
+                            🗓️ Per Month
+                        </button>
+                    </div>
+                </div>
+                <div class="relative h-72 md:h-80 w-full">
+                    <canvas id="dedicatedLeetCodeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Problem Topics Distribution & History -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Solved Problems Log Table -->
+                <div class="lg:col-span-12 glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-white">Logged Solved Problems</h4>
+                            <p class="text-xs text-gray-400">Review solved problem logs, difficulty, date, and approach notes</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="exportLeetCodeCSV()" class="px-3 py-1.5 bg-[#000021] border border-gray-700 hover:border-green-500 text-gray-300 hover:text-white text-xs font-semibold rounded-lg transition">
+                                Export CSV
+                            </button>
+                            <button onclick="openAddLeetCodeModal()" class="px-3.5 py-1.5 bg-green-500 text-slate-950 font-bold text-xs rounded-lg transition">
+                                + Log Problem
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Row -->
+                    <div class="flex flex-wrap items-center gap-3 bg-[#000021] p-3 rounded-xl border border-gray-800 text-xs">
+                        <input type="text" id="lcSearchInput" oninput="filterLeetCodeList()" placeholder="Search title, #, or topic..." class="bg-[#0a0a28] border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:border-green-500 outline-none w-full sm:w-64">
+                        
+                        <select id="lcDifficultyFilter" onchange="filterLeetCodeList()" class="bg-[#0a0a28] border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:border-green-500 outline-none">
+                            <option value="All">All Difficulties</option>
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+
+                        <select id="lcDateFilter" onchange="filterLeetCodeList()" class="bg-[#0a0a28] border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:border-green-500 outline-none">
+                            <option value="All">All Timeframes</option>
+                            <option value="today">Solved Today</option>
+                            <option value="week">Solved This Week</option>
+                            <option value="month">Solved This Month</option>
+                        </select>
+                    </div>
+
+                    <!-- Problems Table -->
+                    <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <table class="w-full text-left text-xs text-gray-300">
+                            <thead class="bg-[#000021] text-gray-400 uppercase text-[10px] tracking-wider sticky top-0 border-b border-gray-800">
+                                <tr>
+                                    <th class="py-3 px-4"># & Title</th>
+                                    <th class="py-3 px-4">Difficulty</th>
+                                    <th class="py-3 px-4">Topic</th>
+                                    <th class="py-3 px-4">Date Solved</th>
+                                    <th class="py-3 px-4">Time Taken</th>
+                                    <th class="py-3 px-4">Approach & Key Takeaway</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leetcodeProblemsTableBody" class="divide-y divide-gray-800/60">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 6: MESSAGES / INBOX ================= -->
+        <section id="tab-messages" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#12123e] p-6 rounded-2xl border border-gray-800">
+                <div>
+                    <h3 class="text-xl font-bold text-white">Contact Inquiries & Leads</h3>
+                    <p class="text-xs text-gray-400 mt-1">Direct inquiries submitted by recruiters, clients, and collaborators.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="exportMessagesCSV()" class="px-3.5 py-2 bg-[#000021] border border-gray-700 hover:border-[#a855f7] text-gray-300 hover:text-white text-xs font-semibold rounded-lg transition">
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inquiries List -->
+            <div id="dashboardMessagesList" class="space-y-4">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 7: PROFILE & BIO SETTINGS ================= -->
+        <section id="tab-settings" class="hidden space-y-6">
+            <form id="profileSettingsForm" onsubmit="handleSaveSettings(event); return false;" class="space-y-6">
+                <!-- Hero & Taglines -->
+                <div class="glass-card p-6 md:p-8 rounded-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2">Identity & Role Settings</h3>
+                    <p class="text-xs text-gray-400 mb-6">Customize your name, target roles, headline, and the animated Typed.js strings.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Full Display Name</label>
+                            <input type="text" id="settingName" required class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Current Role / Title</label>
+                            <input type="text" id="settingRole" placeholder="Frontend & Software Developer" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Headline Prefix</label>
+                            <input type="text" id="settingHeadline" placeholder="A Passionate" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Primary Target Goal</label>
+                            <input type="text" id="settingTargetGoal" placeholder="Target: 300+ LeetCode problems & Full-Stack Mastery" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                                Typed.js Animated Titles (Comma Separated)
+                            </label>
+                            <input type="text" id="settingTypedStrings" placeholder="Web Developer., Frontend Architect., Problem Solver., C & Python Enthusiast." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                            <p class="text-[11px] text-gray-500 mt-1.5">These will loop sequentially on the portfolio hero section.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Narrative Bio Content -->
+                <div class="glass-card p-6 md:p-8 rounded-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2">Personal Biography (Bio)</h3>
+                    <p class="text-xs text-gray-400 mb-6">The main narrative paragraph displayed in the About Me section on your public portfolio.</p>
+                    
+                    <div>
+                        <textarea id="settingAbout" rows="5" required placeholder="Write a comprehensive overview of your background, technical journey, passions, and problem-solving goals..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:border-[#a855f7] outline-none resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Contact & Social Coordinates -->
+                <div class="glass-card p-6 md:p-8 rounded-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2">Contact & Coding Profiles</h3>
+                    <p class="text-xs text-gray-400 mb-6">Manage how visitors, recruiters, and collaborators connect with you.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Email Address</label>
+                            <input type="email" id="settingEmail" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Phone Number</label>
+                            <input type="text" id="settingPhone" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">LeetCode Profile URL</label>
+                            <input type="url" id="settingLeetCode" placeholder="https://leetcode.com/u/ravi_ardhana" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">GitHub Profile URL</label>
+                            <input type="url" id="settingGithub" placeholder="https://github.com/..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">LinkedIn Profile URL</label>
+                            <input type="url" id="settingLinkedin" placeholder="https://linkedin.com/in/..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Resume URL / PDF Link</label>
+                            <input type="text" id="settingResume" placeholder="https://drive.google.com/... or resume.pdf" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-[#a855f7] outline-none">
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-800 flex justify-end">
+                        <button type="submit" class="px-8 py-3 bg-[#a855f7] hover:bg-purple-600 text-white font-semibold rounded-lg shadow-lg shadow-purple-900/50 transition flex items-center space-x-2">
+                            <span>Save Profile & Bio</span>
+                            <span>💾</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+
+    <!-- ================= MODAL 1: ADD / EDIT PROJECT (WITH TIMELINE & DURATION) ================= -->
+    <div id="projectModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden">
+        <div class="bg-[#12123e] border border-gray-800 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="projectModalTitle" class="text-xl font-bold text-white">Add New Project</h3>
+                <button onclick="closeProjectModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+
+            <form id="projectForm" onsubmit="handleSaveProject(event); return false;" class="space-y-4">
+                <input type="hidden" id="projId">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Project Title</label>
+                    <input type="text" id="projTitle" required placeholder="E.g. Algorithmic Sorting Visualizer" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Category</label>
+                        <select id="projCategory" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                            <option value="Frontend">Frontend</option>
+                            <option value="Backend/Logic">Backend/Logic</option>
+                            <option value="Fullstack">Fullstack</option>
+                            <option value="Utility">Utility / Tool</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Status</label>
+                        <select id="projStatus" onchange="handleProjectStatusChange()" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                            <option value="Completed">Completed</option>
+                            <option value="In Progress">In Progress</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Timeline & Duration Section -->
+                <div class="p-4 rounded-xl bg-[#0a0a28] border border-purple-900/40 space-y-3">
+                    <p class="text-xs font-bold text-purple-300 uppercase tracking-wider">Project Timeline & Duration</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Start Date</label>
+                            <input type="date" id="projStartDate" onchange="autoCalculateProjectDuration()" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-white text-xs focus:border-[#a855f7] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Completion Date</label>
+                            <input type="date" id="projEndDate" onchange="autoCalculateProjectDuration()" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-1.5 text-white text-xs focus:border-[#a855f7] outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[11px] font-medium text-gray-400">How long it took to complete (Duration)</label>
+                            <button type="button" onclick="autoCalculateProjectDuration()" class="text-[11px] text-purple-400 hover:underline">Auto Calculate</button>
+                        </div>
+                        <input type="text" id="projDuration" required placeholder="E.g. 3 weeks (21 days) or 2.5 months" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-xs focus:border-[#a855f7] outline-none font-semibold text-purple-300">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Description</label>
+                    <textarea id="projDescription" rows="3" required placeholder="Describe what this project accomplishes, architecture highlights, and problems solved..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Tech Stack (comma separated)</label>
+                    <input type="text" id="projTechStack" placeholder="HTML5, Tailwind, JavaScript, Chart.js" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Live Demo URL</label>
+                        <input type="text" id="projLiveUrl" placeholder="https://..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">GitHub Repo URL</label>
+                        <input type="text" id="projGithubUrl" placeholder="https://github.com/..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeProjectModal()" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-lg transition">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-[#a855f7] hover:bg-purple-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-purple-900/50 transition">Save Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL 2: ADD / EDIT SKILL (WITH LEARNING DURATION) ================= -->
+    <div id="skillModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden">
+        <div class="bg-[#12123e] border border-gray-800 rounded-2xl w-full max-w-md p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="skillModalTitle" class="text-xl font-bold text-white">Add New Skill</h3>
+                <button onclick="closeSkillModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+
+            <form id="skillForm" onsubmit="handleSaveSkill(event); return false;" class="space-y-4">
+                <input type="hidden" id="skillId">
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Emoji</label>
+                        <input type="text" id="skillIcon" required value="⚡" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-center text-xl text-white focus:border-[#a855f7] outline-none">
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Skill Name</label>
+                        <input type="text" id="skillName" required placeholder="E.g. JavaScript" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Category</label>
+                    <select id="skillCategory" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                        <option value="Frontend Core">Frontend Core</option>
+                        <option value="Backend/Logic">Backend/Logic</option>
+                        <option value="Algorithms">Algorithms & Data Structures</option>
+                        <option value="Tools">Tools & DevOps</option>
+                        <option value="Database">Database & Cloud</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Proficiency Level</label>
+                        <span id="skillLevelLabel" class="text-xs text-purple-300 font-bold">85%</span>
+                    </div>
+                    <input type="range" id="skillLevel" min="10" max="100" value="85" oninput="document.getElementById('skillLevelLabel').textContent = this.value + '%'" class="w-full accent-[#a855f7] cursor-pointer">
+                </div>
+
+                <!-- Learning Duration Field -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">How Long It Took To Complete / Learn</label>
+                    <input type="text" id="skillDuration" required placeholder="E.g. 4.5 months (180 hrs) or 6 weeks" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none font-semibold text-purple-300">
+                    <p class="text-[11px] text-gray-500 mt-1">Specify learning duration or total hours invested.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Brief Description / Mastered Concepts</label>
+                    <input type="text" id="skillDescription" placeholder="Semantic Structure, Modern Layouts & Responsive Design" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-[#a855f7] outline-none">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeSkillModal()" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-lg transition">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-[#a855f7] hover:bg-purple-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-purple-900/50 transition">Save Skill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL 3: ADD / EDIT TO-DO TOPIC (LINKED TO SKILL) ================= -->
+    <div id="topicModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden">
+        <div class="bg-[#12123e] border border-gray-800 rounded-2xl w-full max-w-lg p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="topicModalTitle" class="text-xl font-bold text-white">Add To-Do Concept / Topic</h3>
+                <button onclick="closeTopicModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+
+            <form id="topicForm" onsubmit="handleSaveTopic(event); return false;" class="space-y-4">
+                <input type="hidden" id="topicId">
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Topic / Concept Title</label>
+                    <input type="text" id="topicTitle" required placeholder="E.g. Event Loop, Microtasks & Web Workers" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Associated Technical Skill</label>
+                        <select id="topicSkillSelect" required class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                            <!-- Populated dynamically from skills -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Priority</label>
+                        <select id="topicPriority" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                            <option value="High">High Priority</option>
+                            <option value="Medium">Medium Priority</option>
+                            <option value="Low">Low Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Target Completion Date</label>
+                        <input type="date" id="topicTargetDate" required class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Current Status</label>
+                        <select id="topicStatus" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                            <option value="To Do">To Do</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Mastered">Mastered / Done</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Concept Core Summary / What to Cover</label>
+                    <textarea id="topicConcept" rows="2" required placeholder="Key mechanisms, algorithms, syntax, or architecture details to master..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-400 outline-none resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Resource Link / Doc URL</label>
+                    <input type="url" id="topicResource" placeholder="https://..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Personal Study Notes / Action Items</label>
+                    <input type="text" id="topicNotes" placeholder="E.g. Build a visualizer or solve 3 LeetCode problems on this pattern" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-400 outline-none">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeTopicModal()" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-lg transition">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-lg shadow-lg shadow-amber-500/20 transition">Save Concept</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL 4: FULL LEETCODE PROBLEM LOGGER ================= -->
+    <div id="leetcodeModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden">
+        <div class="bg-[#12123e] border border-gray-800 rounded-2xl w-full max-w-lg p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-green-400"></span>
+                    <h3 id="leetcodeModalTitle" class="text-xl font-bold text-white">Log LeetCode Solved Problem</h3>
+                </div>
+                <button onclick="closeLeetCodeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+
+            <form id="leetcodeForm" onsubmit="handleSaveLeetCode(event); return false;" class="space-y-4">
+                <input type="hidden" id="lcId">
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Problem #</label>
+                        <input type="number" id="lcNumber" required placeholder="121" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-500 outline-none font-mono-code font-bold">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Problem Title</label>
+                        <input type="text" id="lcTitle" required placeholder="Best Time to Buy and Sell Stock" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-green-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Difficulty</label>
+                        <select id="lcDifficulty" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-500 outline-none">
+                            <option value="Easy">Easy (Green)</option>
+                            <option value="Medium">Medium (Amber)</option>
+                            <option value="Hard">Hard (Red)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Topic / Tag</label>
+                        <input type="text" id="lcTopic" required placeholder="Arrays & Hashing" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Time Taken (Mins)</label>
+                        <input type="number" id="lcTimeMinutes" min="1" max="300" value="20" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-500 outline-none font-mono-code">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Date Solved</label>
+                        <input type="date" id="lcDate" required class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">LeetCode URL</label>
+                        <input type="url" id="lcUrl" placeholder="https://leetcode.com/problems/..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Algorithmic Approach / Solution Notes</label>
+                    <textarea id="lcApproach" rows="3" placeholder="Time & space complexity (e.g. O(n) time, O(1) space), data structure used, key realization..." class="w-full bg-[#000021] border border-gray-700 rounded-lg px-4 py-2 text-white text-sm focus:border-green-500 outline-none resize-none"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeLeetCodeModal()" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-lg transition">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-slate-950 font-bold text-sm rounded-lg shadow-lg shadow-green-500/20 transition">Log Solved Problem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL 5: QUICK 10-SECOND LEETCODE SOLVE ================= -->
+    <div id="quickLeetCodeModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden">
+        <div class="bg-[#12123e] border border-gray-800 rounded-2xl w-full max-w-sm p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white">⚡ Quick Log Solved Problem</h3>
+                <button onclick="closeQuickLeetCodeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <form onsubmit="handleQuickLeetCodeSave(event); return false;" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Problem Title or #</label>
+                    <input type="text" id="quickLcTitle" required placeholder="E.g. #217 Contains Duplicate" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-400 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Difficulty</label>
+                        <select id="quickLcDiff" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-400 outline-none">
+                            <option value="Easy">Easy</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Time (mins)</label>
+                        <input type="number" id="quickLcMins" value="20" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-400 outline-none font-mono-code">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Topic</label>
+                    <input type="text" id="quickLcTopic" value="Arrays & Hashing" class="w-full bg-[#000021] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-green-400 outline-none">
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeQuickLeetCodeModal()" class="px-4 py-2 bg-gray-800 text-gray-300 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-slate-950 font-bold text-xs rounded-lg">Log Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- App Scripts -->
+    <script src="js/app-storage.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

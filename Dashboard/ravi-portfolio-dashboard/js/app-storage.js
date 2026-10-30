@@ -1,0 +1,1343 @@
+/**
+ * Ravi Ardhana Portfolio & Dashboard State Manager
+ * Dual-Mode: Automatically connects to Python REST API if running,
+ * or operates in high-speed LocalStorage mode when opened standalone.
+ * Handles Projects with Timeline & Completion Duration, Skills & Learning Duration,
+ * Profile & Bio, To-Do Topics/Concepts linked to Skills, and LeetCode Solves (Day/Week/Month).
+ */
+
+const STORAGE_KEY = 'ravi_portfolio_state_v2';
+
+const DEFAULT_STATE = {
+  profile: {
+    name: "Ravi Ardhana",
+    role: "Frontend & Software Developer",
+    headline: "A Passionate",
+    typedStrings: [
+      "Web Developer.",
+      "Frontend Architect.",
+      "Problem Solver & Competitive Programmer.",
+      "C & Python Enthusiast."
+    ],
+    about: "I am a dedicated and results-driven software developer with a strong foundation in modern web engineering, algorithms, and system programming. Driven by transforming complex problem statements into elegant, high-performance digital experiences. Constantly mastering new concepts through structured skill roadmaps and daily problem solving.",
+    targetGoal: "Target: 300+ LeetCode problems & Full-Stack Mastery",
+    email: "ravi.ardhana01@gmail.com",
+    instagram: "@ravi.ardhana.1",
+    instagramUrl: "https://www.instagram.com/ravidevelops",
+    phone: "+91 88240 08948",
+    githubUrl: "https://github.com/ravi-ardhana",
+    linkedinUrl: "https://linkedin.com/in/ravi-ardhana",
+    leetcodeUrl: "https://leetcode.com/u/ravi_ardhana",
+    resumeUrl: "#"
+  },
+  stats: {
+    totalVisitors: 1420,
+    viewsThisWeek: 284,
+    weeklyTraffic: [
+      { day: "Mon", views: 32 },
+      { day: "Tue", views: 45 },
+      { day: "Wed", views: 61 },
+      { day: "Thu", views: 58 },
+      { day: "Fri", views: 74 },
+      { day: "Sat", views: 89 },
+      { day: "Sun", views: 65 }
+    ]
+  },
+  skills: [
+    {
+      id: "sk-1",
+      name: "HTML & CSS",
+      category: "Frontend Core",
+      icon: "💻",
+      level: 92,
+      duration: "3 months (120 hrs)",
+      startDate: "2026-01-10",
+      completionDate: "2026-04-10",
+      description: "Semantic Structure, Modern Layouts, Flexbox, Grid & Responsive Design"
+    },
+    {
+      id: "sk-2",
+      name: "JavaScript",
+      category: "Frontend Core",
+      icon: "⚡",
+      level: 88,
+      duration: "4.5 months (180 hrs)",
+      startDate: "2026-02-15",
+      completionDate: "2026-06-30",
+      description: "Client-Side Logic, ES6+, DOM Manipulation, Async/Await & Event Architecture"
+    },
+    {
+      id: "sk-3",
+      name: "Python",
+      category: "Backend/Logic",
+      icon: "🐍",
+      level: 85,
+      duration: "5 months (200 hrs)",
+      startDate: "2026-03-01",
+      completionDate: "2026-08-01",
+      description: "Scripting, Automation, OOP, Data Structures, Web Scraping & Backend APIs"
+    },
+    {
+      id: "sk-4",
+      name: "C & Data Structures",
+      category: "Algorithms",
+      icon: "💼",
+      level: 80,
+      duration: "6 months (220 hrs)",
+      startDate: "2026-01-05",
+      completionDate: "2026-07-15",
+      description: "Memory Management, Pointers, Linked Lists, Trees, Graphs & Dynamic Programming"
+    },
+    {
+      id: "sk-5",
+      name: "Tailwind CSS",
+      category: "Frontend Core",
+      icon: "🎨",
+      level: 90,
+      duration: "1.5 months (60 hrs)",
+      startDate: "2026-05-01",
+      completionDate: "2026-06-15",
+      description: "Utility-First CSS, Custom Themes, Responsive UI & Glassmorphism"
+    },
+    {
+      id: "sk-6",
+      name: "Git & GitHub",
+      category: "Tools",
+      icon: "🐙",
+      level: 84,
+      duration: "1 month (40 hrs)",
+      startDate: "2026-02-01",
+      completionDate: "2026-03-01",
+      description: "Version Control, Branching, Pull Requests, Merge Conflict Resolution & CI/CD"
+    },
+    {
+      id: "sk-7",
+      name: "SQL & Relational Databases",
+      category: "Database",
+      icon: "🗄️",
+      level: 78,
+      duration: "2 months (80 hrs)",
+      startDate: "2026-06-01",
+      completionDate: "2026-08-01",
+      description: "Schema Design, Queries, Joins, Indexes, Transactions & SQLite / PostgreSQL"
+    }
+  ],
+  projects: [
+    {
+      id: "proj-1",
+      title: "Interactive Developer Portfolio & CMS",
+      category: "Frontend",
+      description: "Modern responsive portfolio featuring dynamic analytics, dark navy glassmorphism, Typed.js animations, and real-time dashboard.",
+      techStack: ["HTML5", "Tailwind CSS", "JavaScript", "Chart.js"],
+      startDate: "2026-10-05",
+      endDate: "2026-10-26",
+      duration: "3 weeks (21 days)",
+      status: "Completed",
+      liveUrl: "#",
+      githubUrl: "https://github.com/ravi-ardhana/portfolio",
+      featured: true
+    },
+    {
+      id: "proj-2",
+      title: "Python Automation & Scraper Suite",
+      category: "Backend/Logic",
+      description: "Multi-threaded scraping and data pipeline script to automate daily report compilation, anomaly detection, and email distribution.",
+      techStack: ["Python", "BeautifulSoup", "SQLite", "Automation"],
+      startDate: "2026-08-10",
+      endDate: "2026-09-22",
+      duration: "6 weeks (43 days)",
+      status: "Completed",
+      liveUrl: "#",
+      githubUrl: "https://github.com/ravi-ardhana/scraper-suite",
+      featured: true
+    },
+    {
+      id: "proj-3",
+      title: "Algorithmic Sorting & Graph Visualizer",
+      category: "Frontend",
+      description: "Interactive visualizer for QuickSort, MergeSort, Dijkstra, and BFS/DFS with dynamic canvas animations and sound synthesis.",
+      techStack: ["JavaScript", "Canvas API", "Algorithms", "CSS3"],
+      startDate: "2026-10-12",
+      endDate: "",
+      duration: "In Progress (2.5 weeks so far)",
+      status: "In Progress",
+      liveUrl: "#",
+      githubUrl: "https://github.com/ravi-ardhana/algo-visualizer",
+      featured: true
+    },
+    {
+      id: "proj-4",
+      title: "C System Performance Monitor",
+      category: "Backend/Logic",
+      description: "CLI utility to monitor memory allocations, CPU spikes, and process states with detailed terminal charts.",
+      techStack: ["C", "POSIX", "Data Structures", "OS"],
+      startDate: "2026-07-01",
+      endDate: "2026-08-05",
+      duration: "5 weeks (35 days)",
+      status: "Completed",
+      liveUrl: "#",
+      githubUrl: "https://github.com/ravi-ardhana/sys-monitor",
+      featured: false
+    },
+    {
+      id: "proj-5",
+      title: "Fullstack E-Commerce API & Store",
+      category: "Fullstack",
+      description: "REST API backend with JWT authentication, cart persistence, payment integration, and responsive store frontend.",
+      techStack: ["Python", "REST API", "JavaScript", "SQLite", "Tailwind"],
+      startDate: "2026-09-15",
+      endDate: "2026-10-20",
+      duration: "5 weeks (36 days)",
+      status: "Completed",
+      liveUrl: "#",
+      githubUrl: "https://github.com/ravi-ardhana/ecommerce-store",
+      featured: true
+    }
+  ],
+  topics: [
+    {
+      id: "top-1",
+      skillId: "sk-2",
+      skillName: "JavaScript",
+      title: "Event Loop, Microtasks & Web Workers",
+      concept: "Concurrency model, Call Stack, Task Queue vs Microtask Queue, requestAnimationFrame, and background Web Workers for CPU-heavy tasks.",
+      priority: "High",
+      targetDate: "2026-11-05",
+      status: "In Progress",
+      resource: "https://javascript.info/event-loop",
+      notes: "Build a simulation or small visualizer for the call stack and microtask queue."
+    },
+    {
+      id: "top-2",
+      skillId: "sk-3",
+      skillName: "Python",
+      title: "Asyncio & Async Iterators",
+      concept: "Coroutines, event loops, asyncio.gather, TaskGroups in Python 3.11+, and non-blocking network I/O pipelines.",
+      priority: "High",
+      targetDate: "2026-11-08",
+      status: "To Do",
+      resource: "https://docs.python.org/3/library/asyncio.html",
+      notes: "Refactor web scraper to use asyncio and aiohttp for 10x throughput."
+    },
+    {
+      id: "top-3",
+      skillId: "sk-4",
+      skillName: "C & Data Structures",
+      title: "Segment Trees & Lazy Propagation",
+      concept: "Range sum/minimum queries in O(log n), dynamic point and range updates with lazy propagation flags.",
+      priority: "High",
+      targetDate: "2026-11-12",
+      status: "To Do",
+      resource: "https://cp-algorithms.com/data_structures/segment_tree.html",
+      notes: "Prepare for hard LeetCode range query and interval problems."
+    },
+    {
+      id: "top-4",
+      skillId: "sk-4",
+      skillName: "C & Data Structures",
+      title: "Dynamic Programming: Bitmasking & Digit DP",
+      concept: "Subset representation using bitmasks, Hamiltonian paths, TSP state compression, and digit DP counting.",
+      priority: "High",
+      targetDate: "2026-11-18",
+      status: "In Progress",
+      resource: "https://leetcode.com/discuss/general-discussion/458695/dynamic-programming-patterns",
+      notes: "Solve 5 Bitmask DP LeetCode Hard problems."
+    },
+    {
+      id: "top-5",
+      skillId: "sk-5",
+      skillName: "Tailwind CSS",
+      title: "Container Queries & Custom Plugins",
+      concept: "@container queries, fluid typography, dark mode CSS variables architecture, and custom Tailwind utility plugins.",
+      priority: "Medium",
+      targetDate: "2026-10-25",
+      status: "Mastered",
+      resource: "https://tailwindcss.com/docs/container-queries",
+      notes: "Implemented successfully in the latest dashboard component cards."
+    },
+    {
+      id: "top-6",
+      skillId: "sk-7",
+      skillName: "SQL & Relational Databases",
+      title: "B-Tree Indexes & EXPLAIN Query Optimization",
+      concept: "Covering indexes, composite index column ordering, preventing full table scans in large datasets, and EXPLAIN ANALYZE execution trees.",
+      priority: "Medium",
+      targetDate: "2026-11-22",
+      status: "To Do",
+      resource: "https://use-the-index-luke.com/",
+      notes: "Profile slow queries on sample e-commerce database."
+    },
+    {
+      id: "top-7",
+      skillId: "sk-1",
+      skillName: "HTML & CSS",
+      title: "Web Accessibility (WCAG 2.2 AA) & ARIA Patterns",
+      concept: "Screen reader live regions, focus trap in modals, contrast ratios, and accessible rich internet applications (ARIA).",
+      priority: "Low",
+      targetDate: "2026-11-28",
+      status: "To Do",
+      resource: "https://www.w3.org/WAI/ARIA/apg/",
+      notes: "Audit portfolio and dashboard with axe-core."
+    }
+  ],
+  leetcode: {
+    goals: {
+      targetPerDay: 2,
+      targetPerWeek: 14,
+      targetPerMonth: 50,
+      totalTarget: 300
+    },
+    problems: [
+      {
+        id: "lc-1",
+        number: 121,
+        title: "Best Time to Buy and Sell Stock",
+        difficulty: "Easy",
+        topic: "Arrays & Hashing",
+        date: "2026-10-31",
+        timeMinutes: 12,
+        url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+        approach: "Track minimum price seen so far and calculate max potential profit at each step in O(n) time, O(1) space."
+      },
+      {
+        id: "lc-2",
+        number: 238,
+        title: "Product of Array Except Self",
+        difficulty: "Medium",
+        topic: "Arrays & Hashing",
+        date: "2026-10-31",
+        timeMinutes: 22,
+        url: "https://leetcode.com/problems/product-of-array-except-self/",
+        approach: "Two-pass prefix and suffix product accumulation in result array without using division operator."
+      },
+      {
+        id: "lc-3",
+        number: 76,
+        title: "Minimum Window Substring",
+        difficulty: "Hard",
+        topic: "Sliding Window",
+        date: "2026-10-31",
+        timeMinutes: 45,
+        url: "https://leetcode.com/problems/minimum-window-substring/",
+        approach: "Dynamic sliding window with frequency map and match counter. Contract window when valid."
+      },
+      {
+        id: "lc-4",
+        number: 15,
+        title: "3Sum",
+        difficulty: "Medium",
+        topic: "Two Pointers",
+        date: "2026-10-30",
+        timeMinutes: 28,
+        url: "https://leetcode.com/problems/3sum/",
+        approach: "Sort array, fix one element and use two pointers to find pairs summing to -nums[i]. Skip duplicates."
+      },
+      {
+        id: "lc-5",
+        number: 20,
+        title: "Valid Parentheses",
+        difficulty: "Easy",
+        topic: "Stack",
+        date: "2026-10-30",
+        timeMinutes: 8,
+        url: "https://leetcode.com/problems/valid-parentheses/",
+        approach: "Stack of open brackets matched against closed brackets using hash map in O(n) time."
+      },
+      {
+        id: "lc-6",
+        number: 11,
+        title: "Container With Most Water",
+        difficulty: "Medium",
+        topic: "Two Pointers",
+        date: "2026-10-30",
+        timeMinutes: 18,
+        url: "https://leetcode.com/problems/container-with-most-water/",
+        approach: "Two pointers at edges; move the pointer with the shorter line inwards greedily to seek larger areas."
+      },
+      {
+        id: "lc-7",
+        number: 424,
+        title: "Longest Repeating Character Replacement",
+        difficulty: "Medium",
+        topic: "Sliding Window",
+        date: "2026-10-29",
+        timeMinutes: 32,
+        url: "https://leetcode.com/problems/longest-repeating-character-replacement/",
+        approach: "Sliding window tracking max frequency count. Slide window when window length - maxFreq > k."
+      },
+      {
+        id: "lc-8",
+        number: 125,
+        title: "Valid Palindrome",
+        difficulty: "Easy",
+        topic: "Two Pointers",
+        date: "2026-10-29",
+        timeMinutes: 10,
+        url: "https://leetcode.com/problems/valid-palindrome/",
+        approach: "Two pointers from ends skipping non-alphanumeric chars with case insensitivity."
+      },
+      {
+        id: "lc-9",
+        number: 3,
+        title: "Longest Substring Without Repeating Characters",
+        difficulty: "Medium",
+        topic: "Sliding Window",
+        date: "2026-10-28",
+        timeMinutes: 20,
+        url: "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
+        approach: "Sliding window with hash map storing last seen index of each character."
+      },
+      {
+        id: "lc-10",
+        number: 42,
+        title: "Trapping Rain Water",
+        difficulty: "Hard",
+        topic: "Two Pointers",
+        date: "2026-10-28",
+        timeMinutes: 48,
+        url: "https://leetcode.com/problems/trapping-rain-water/",
+        approach: "Two pointers with left_max and right_max bounds in O(n) time and O(1) auxiliary space."
+      },
+      {
+        id: "lc-11",
+        number: 49,
+        title: "Group Anagrams",
+        difficulty: "Medium",
+        topic: "Arrays & Hashing",
+        date: "2026-10-27",
+        timeMinutes: 18,
+        url: "https://leetcode.com/problems/group-anagrams/",
+        approach: "Hash map using character count tuple (or sorted string) as key grouping anagram lists."
+      },
+      {
+        id: "lc-12",
+        number: 1,
+        title: "Two Sum",
+        difficulty: "Easy",
+        topic: "Arrays & Hashing",
+        date: "2026-10-27",
+        timeMinutes: 6,
+        url: "https://leetcode.com/problems/two-sum/",
+        approach: "One-pass hash map storing value to index mapping to check target - current."
+      },
+      {
+        id: "lc-13",
+        number: 739,
+        title: "Daily Temperatures",
+        difficulty: "Medium",
+        topic: "Stack",
+        date: "2026-10-26",
+        timeMinutes: 24,
+        url: "https://leetcode.com/problems/daily-temperatures/",
+        approach: "Monotonic decreasing stack storing indices of temperatures."
+      },
+      {
+        id: "lc-14",
+        number: 84,
+        title: "Largest Rectangle in Histogram",
+        difficulty: "Hard",
+        topic: "Stack",
+        date: "2026-10-26",
+        timeMinutes: 52,
+        url: "https://leetcode.com/problems/largest-rectangle-in-histogram/",
+        approach: "Monotonic increasing stack storing pair of index and height. Pop and compute areas on drops."
+      },
+      {
+        id: "lc-15",
+        number: 704,
+        title: "Binary Search",
+        difficulty: "Easy",
+        topic: "Binary Search",
+        date: "2026-10-26",
+        timeMinutes: 5,
+        url: "https://leetcode.com/problems/binary-search/",
+        approach: "Standard classic binary search with mid = left + (right - left) // 2."
+      },
+      {
+        id: "lc-16",
+        number: 74,
+        title: "Search a 2D Matrix",
+        difficulty: "Medium",
+        topic: "Binary Search",
+        date: "2026-10-25",
+        timeMinutes: 16,
+        url: "https://leetcode.com/problems/search-a-2d-matrix/",
+        approach: "Treat 2D m x n matrix as 1D virtual sorted array of size m*n; binary search in O(log(mn))."
+      },
+      {
+        id: "lc-17",
+        number: 153,
+        title: "Find Minimum in Rotated Sorted Array",
+        difficulty: "Medium",
+        topic: "Binary Search",
+        date: "2026-10-24",
+        timeMinutes: 20,
+        url: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/",
+        approach: "Binary search comparing mid element with right boundary to locate inflection point."
+      },
+      {
+        id: "lc-18",
+        number: 206,
+        title: "Reverse Linked List",
+        difficulty: "Easy",
+        topic: "Linked List",
+        date: "2026-10-23",
+        timeMinutes: 7,
+        url: "https://leetcode.com/problems/reverse-linked-list/",
+        approach: "Iterative three-pointer approach (prev, curr, next) in O(n) time and O(1) space."
+      },
+      {
+        id: "lc-19",
+        number: 141,
+        title: "Linked List Cycle",
+        difficulty: "Easy",
+        topic: "Linked List",
+        date: "2026-10-22",
+        timeMinutes: 9,
+        url: "https://leetcode.com/problems/linked-list-cycle/",
+        approach: "Floyd's Tortoise and Hare two-pointer cycle detection."
+      },
+      {
+        id: "lc-20",
+        number: 143,
+        title: "Reorder List",
+        difficulty: "Medium",
+        topic: "Linked List",
+        date: "2026-10-21",
+        timeMinutes: 26,
+        url: "https://leetcode.com/problems/reorder-list/",
+        approach: "Find middle of list, reverse second half, merge first half and reversed second half."
+      },
+      {
+        id: "lc-21",
+        number: 226,
+        title: "Invert Binary Tree",
+        difficulty: "Easy",
+        topic: "Trees",
+        date: "2026-10-20",
+        timeMinutes: 6,
+        url: "https://leetcode.com/problems/invert-binary-tree/",
+        approach: "Recursive depth-first traversal swapping left and right child nodes."
+      },
+      {
+        id: "lc-22",
+        number: 104,
+        title: "Maximum Depth of Binary Tree",
+        difficulty: "Easy",
+        topic: "Trees",
+        date: "2026-10-19",
+        timeMinutes: 7,
+        url: "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
+        approach: "DFS post-order returning 1 + max(leftDepth, rightDepth)."
+      },
+      {
+        id: "lc-23",
+        number: 102,
+        title: "Binary Tree Level Order Traversal",
+        difficulty: "Medium",
+        topic: "Trees",
+        date: "2026-10-18",
+        timeMinutes: 18,
+        url: "https://leetcode.com/problems/binary-tree-level-order-traversal/",
+        approach: "BFS level-by-level traversal using deque with queue size snapshot."
+      },
+      {
+        id: "lc-24",
+        number: 98,
+        title: "Validate Binary Search Tree",
+        difficulty: "Medium",
+        topic: "Trees",
+        date: "2026-10-17",
+        timeMinutes: 22,
+        url: "https://leetcode.com/problems/validate-binary-search-tree/",
+        approach: "In-order traversal verifying strictly increasing values, or DFS with min/max valid bounds."
+      },
+      {
+        id: "lc-25",
+        number: 200,
+        title: "Number of Islands",
+        difficulty: "Medium",
+        topic: "Graphs",
+        date: "2026-10-15",
+        timeMinutes: 25,
+        url: "https://leetcode.com/problems/number-of-islands/",
+        approach: "BFS/DFS flood-fill algorithm sinking visited '1's into '0's."
+      },
+      {
+        id: "lc-26",
+        number: 133,
+        title: "Clone Graph",
+        difficulty: "Medium",
+        topic: "Graphs",
+        date: "2026-10-14",
+        timeMinutes: 24,
+        url: "https://leetcode.com/problems/clone-graph/",
+        approach: "DFS traversal using hash map to map original nodes to their cloned counterparts."
+      },
+      {
+        id: "lc-27",
+        number: 417,
+        title: "Pacific Atlantic Water Flow",
+        difficulty: "Medium",
+        topic: "Graphs",
+        date: "2026-10-12",
+        timeMinutes: 35,
+        url: "https://leetcode.com/problems/pacific-atlantic-water-flow/",
+        approach: "Multi-source BFS from coastal boundary cells inward; intersect reachable cell sets."
+      },
+      {
+        id: "lc-28",
+        number: 207,
+        title: "Course Schedule",
+        difficulty: "Medium",
+        topic: "Graphs",
+        date: "2026-10-10",
+        timeMinutes: 28,
+        url: "https://leetcode.com/problems/course-schedule/",
+        approach: "Kahn's Algorithm topological sort with in-degree array, checking for DAG cycles."
+      },
+      {
+        id: "lc-29",
+        number: 70,
+        title: "Climbing Stairs",
+        difficulty: "Easy",
+        topic: "Dynamic Programming",
+        date: "2026-10-08",
+        timeMinutes: 6,
+        url: "https://leetcode.com/problems/climbing-stairs/",
+        approach: "Bottom-up dynamic programming Fibonacci sequence in O(n) time, O(1) space."
+      },
+      {
+        id: "lc-30",
+        number: 198,
+        title: "House Robber",
+        difficulty: "Medium",
+        topic: "Dynamic Programming",
+        date: "2026-10-06",
+        timeMinutes: 18,
+        url: "https://leetcode.com/problems/house-robber/",
+        approach: "DP recurrence rob = max(nums[i] + rob1, rob2) tracking two state variables."
+      },
+      {
+        id: "lc-31",
+        number: 322,
+        title: "Coin Change",
+        difficulty: "Medium",
+        topic: "Dynamic Programming",
+        date: "2026-10-04",
+        timeMinutes: 26,
+        url: "https://leetcode.com/problems/coin-change/",
+        approach: "Bottom-up 1D DP array of size amount + 1 initialized to infinity. dp[a] = min(dp[a], 1 + dp[a - c])."
+      },
+      {
+        id: "lc-32",
+        number: 300,
+        title: "Longest Increasing Subsequence",
+        difficulty: "Medium",
+        topic: "Dynamic Programming",
+        date: "2026-10-02",
+        timeMinutes: 30,
+        url: "https://leetcode.com/problems/longest-increasing-subsequence/",
+        approach: "Patience sorting with binary search (bisect_left) in tails array in O(n log n) time."
+      },
+      {
+        id: "lc-33",
+        number: 1143,
+        title: "Longest Common Subsequence",
+        difficulty: "Medium",
+        topic: "Dynamic Programming",
+        date: "2026-09-28",
+        timeMinutes: 32,
+        url: "https://leetcode.com/problems/longest-common-subsequence/",
+        approach: "2D DP grid matching characters diagonally or taking max of adjacent cells."
+      },
+      {
+        id: "lc-34",
+        number: 53,
+        title: "Maximum Subarray",
+        difficulty: "Medium",
+        topic: "Dynamic Programming",
+        date: "2026-09-25",
+        timeMinutes: 12,
+        url: "https://leetcode.com/problems/maximum-subarray/",
+        approach: "Kadane's algorithm resetting running sum when negative in O(n) time."
+      },
+      {
+        id: "lc-35",
+        number: 217,
+        title: "Contains Duplicate",
+        difficulty: "Easy",
+        topic: "Arrays & Hashing",
+        date: "2026-09-22",
+        timeMinutes: 5,
+        url: "https://leetcode.com/problems/contains-duplicate/",
+        approach: "Hash set comparison length vs array length in O(n) time."
+      },
+      {
+        id: "lc-36",
+        number: 242,
+        title: "Valid Anagram",
+        difficulty: "Easy",
+        topic: "Arrays & Hashing",
+        date: "2026-09-20",
+        timeMinutes: 6,
+        url: "https://leetcode.com/problems/valid-anagram/",
+        approach: "Character count array / hash map comparison."
+      },
+      {
+        id: "lc-37",
+        number: 347,
+        title: "Top K Frequent Elements",
+        difficulty: "Medium",
+        topic: "Heap / Priority Queue",
+        date: "2026-09-18",
+        timeMinutes: 24,
+        url: "https://leetcode.com/problems/top-k-frequent-elements/",
+        approach: "Bucket sort with frequency array of lists to achieve linear O(n) time."
+      },
+      {
+        id: "lc-38",
+        number: 295,
+        title: "Find Median from Data Stream",
+        difficulty: "Hard",
+        topic: "Heap / Priority Queue",
+        date: "2026-09-15",
+        timeMinutes: 42,
+        url: "https://leetcode.com/problems/find-median-from-data-stream/",
+        approach: "Two balanced heaps: max-heap for small half and min-heap for large half."
+      },
+      {
+        id: "lc-39",
+        number: 78,
+        title: "Subsets",
+        difficulty: "Medium",
+        topic: "Backtracking",
+        date: "2026-09-12",
+        timeMinutes: 20,
+        url: "https://leetcode.com/problems/subsets/",
+        approach: "Recursive backtracking choosing to include or exclude each element."
+      },
+      {
+        id: "lc-40",
+        number: 39,
+        title: "Combination Sum",
+        difficulty: "Medium",
+        topic: "Backtracking",
+        date: "2026-09-08",
+        timeMinutes: 25,
+        url: "https://leetcode.com/problems/combination-sum/",
+        approach: "Backtracking tree allowing reuse of same candidate until sum exceeds target."
+      },
+      {
+        id: "lc-41",
+        number: 51,
+        title: "N-Queens",
+        difficulty: "Hard",
+        topic: "Backtracking",
+        date: "2026-09-04",
+        timeMinutes: 55,
+        url: "https://leetcode.com/problems/n-queens/",
+        approach: "Row-by-row placement tracking occupied columns and positive/negative diagonals with sets."
+      },
+      {
+        id: "lc-42",
+        number: 191,
+        title: "Number of 1 Bits",
+        difficulty: "Easy",
+        topic: "Bit Manipulation",
+        date: "2026-08-30",
+        timeMinutes: 6,
+        url: "https://leetcode.com/problems/number-of-1-bits/",
+        approach: "Brian Kernighan's bit hack: n &= (n - 1) to clear lowest set bit."
+      },
+      {
+        id: "lc-43",
+        number: 338,
+        title: "Counting Bits",
+        difficulty: "Easy",
+        topic: "Bit Manipulation",
+        date: "2026-08-27",
+        timeMinutes: 10,
+        url: "https://leetcode.com/problems/counting-bits/",
+        approach: "DP with bit shifting: dp[i] = dp[i >> 1] + (i & 1) in linear O(n) time."
+      },
+      {
+        id: "lc-44",
+        number: 136,
+        title: "Single Number",
+        difficulty: "Easy",
+        topic: "Bit Manipulation",
+        date: "2026-08-22",
+        timeMinutes: 5,
+        url: "https://leetcode.com/problems/single-number/",
+        approach: "XOR all numbers together; duplicate pairs cancel to 0 leaving unique number."
+      },
+      {
+        id: "lc-45",
+        number: 268,
+        title: "Missing Number",
+        difficulty: "Easy",
+        topic: "Bit Manipulation",
+        date: "2026-08-18",
+        timeMinutes: 6,
+        url: "https://leetcode.com/problems/missing-number/",
+        approach: "Sum formula n*(n+1)//2 minus array sum or XOR approach."
+      },
+      {
+        id: "lc-46",
+        number: 57,
+        title: "Insert Interval",
+        difficulty: "Medium",
+        topic: "Intervals",
+        date: "2026-08-14",
+        timeMinutes: 26,
+        url: "https://leetcode.com/problems/insert-interval/",
+        approach: "Three-phase linear scan: add non-overlapping left, merge overlapping, add non-overlapping right."
+      },
+      {
+        id: "lc-47",
+        number: 56,
+        title: "Merge Intervals",
+        difficulty: "Medium",
+        topic: "Intervals",
+        date: "2026-08-10",
+        timeMinutes: 22,
+        url: "https://leetcode.com/problems/merge-intervals/",
+        approach: "Sort intervals by start time and merge greedily if current start <= previous end."
+      },
+      {
+        id: "lc-48",
+        number: 435,
+        title: "Non-overlapping Intervals",
+        difficulty: "Medium",
+        topic: "Intervals",
+        date: "2026-08-05",
+        timeMinutes: 28,
+        url: "https://leetcode.com/problems/non-overlapping-intervals/",
+        approach: "Greedy interval scheduling: sort by end times and count non-conflicting intervals."
+      }
+    ]
+  },
+  messages: [
+    {
+      id: "msg-1",
+      name: "Sarah Jenkins",
+      email: "sarah.j@techcorp.io",
+      subject: "Frontend Developer Internship Opportunity",
+      message: "Hi Ravi! We loved your portfolio and your projects in JavaScript and Python. We would love to discuss a 3-month summer developer internship with our team.",
+      date: "2026-10-28 14:22",
+      status: "New"
+    },
+    {
+      id: "msg-2",
+      name: "Alex Morales",
+      email: "alex.m@designcraft.co",
+      subject: "Freelance Landing Page Collaboration",
+      message: "Hey Ravi, I'm building a SaaS product and need an eye-catching landing page with dark theme aesthetics similar to your portfolio. Are you open for freelance contracts?",
+      date: "2026-10-29 09:45",
+      status: "Replied"
+    }
+  ]
+};
+
+class PortfolioStore {
+  constructor() {
+    this.hasServer = false;
+    this.serverUrl = (window.location.protocol.startsWith('http')) ? '' : 'http://localhost:8000';
+    this.cache = this.loadLocal();
+    this.listeners = [];
+
+    // Setup cross-tab sync channel
+    try {
+      this.channel = new BroadcastChannel('ravi_portfolio_bus');
+      this.channel.onmessage = (event) => {
+        if (event.data) {
+          this.cache = event.data;
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.cache));
+          } catch (e) {}
+          window.dispatchEvent(new CustomEvent('portfolioDataChanged', { detail: this.cache }));
+        }
+      };
+    } catch (e) {
+      this.channel = null;
+    }
+
+    // Also listen to window storage events
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          this.cache = JSON.parse(e.newValue);
+          window.dispatchEvent(new CustomEvent('portfolioDataChanged', { detail: this.cache }));
+        } catch (err) {}
+      }
+    });
+  }
+
+  async checkServer() {
+    try {
+      const res = await fetch(`${this.serverUrl}/api/status`, { method: 'GET', cache: 'no-store' });
+      if (res.ok) {
+        this.hasServer = true;
+        return true;
+      }
+    } catch (e) {
+      this.hasServer = false;
+    }
+    return false;
+  }
+
+  loadLocal() {
+    try {
+      const item = localStorage.getItem(STORAGE_KEY);
+      if (item) {
+        const parsed = JSON.parse(item);
+        // Ensure topics and leetcode exist in cached data
+        if (!parsed.topics) parsed.topics = DEFAULT_STATE.topics;
+        if (!parsed.leetcode) parsed.leetcode = DEFAULT_STATE.leetcode;
+        return parsed;
+      }
+    } catch (e) {
+      console.warn("LocalStorage access failed:", e);
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_STATE));
+  }
+
+  saveLocal(data) {
+    this.cache = data;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      window.dispatchEvent(new CustomEvent('portfolioDataChanged', { detail: data }));
+      if (this.channel) {
+        this.channel.postMessage(data);
+      }
+    } catch (e) {
+      console.warn("Failed to save to localStorage:", e);
+    }
+  }
+
+  async getData() {
+    const isOnline = await this.checkServer();
+    if (isOnline) {
+      try {
+        const res = await fetch(`${this.serverUrl}/api/data`, { cache: 'no-store' });
+        if (res.ok) {
+          const serverData = await res.json();
+          const merged = { ...this.cache, ...serverData };
+
+          // Preserve deeper lists if present
+          if (Array.isArray(serverData.projects) && serverData.projects.length > 0) merged.projects = serverData.projects;
+          if (Array.isArray(serverData.skills) && serverData.skills.length > 0) merged.skills = serverData.skills;
+          if (Array.isArray(serverData.topics) && serverData.topics.length > 0) merged.topics = serverData.topics;
+          if (serverData.leetcode && Array.isArray(serverData.leetcode.problems)) merged.leetcode = serverData.leetcode;
+
+          this.cache = merged;
+          this.saveLocal(this.cache);
+          return this.cache;
+        }
+      } catch (e) {
+        console.warn("Failed to fetch from server, using local cache:", e);
+      }
+    }
+    return this.cache;
+  }
+
+  async logVisit(path = window.location.pathname) {
+    const data = this.cache;
+    data.stats.totalVisitors = (data.stats.totalVisitors || 0) + 1;
+    data.stats.viewsThisWeek = (data.stats.viewsThisWeek || 0) + 1;
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/visit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path })
+      });
+    } catch (e) {}
+  }
+
+  async submitContactForm(formData) {
+    const data = this.cache;
+    const newMessage = {
+      id: 'msg-' + Date.now(),
+      name: formData.name || 'Anonymous',
+      email: formData.email || '',
+      subject: formData.subject || 'Portfolio Inquiry',
+      message: formData.message || '',
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'New'
+    };
+
+    if (!Array.isArray(data.messages)) {
+      data.messages = [];
+    }
+    data.messages.unshift(newMessage);
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMessage)
+      });
+    } catch (e) {
+      console.warn("Contact saved locally:", e);
+    }
+    return newMessage;
+  }
+
+  async saveProjects(projectsList) {
+    const data = this.cache;
+    data.projects = projectsList;
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/projects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projects: projectsList })
+      });
+    } catch (e) {}
+    return true;
+  }
+
+  async saveSkills(skillsList) {
+    const data = this.cache;
+    data.skills = skillsList;
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/skills`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skills: skillsList })
+      });
+    } catch (e) {}
+    return true;
+  }
+
+  async saveTopics(topicsList) {
+    const data = this.cache;
+    data.topics = topicsList;
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/topics`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topics: topicsList })
+      });
+    } catch (e) {}
+    return true;
+  }
+
+  async addTopic(topic) {
+    const data = this.cache;
+    if (!Array.isArray(data.topics)) data.topics = [];
+    const newTopic = {
+      id: topic.id || ('top-' + Date.now()),
+      ...topic
+    };
+    data.topics.unshift(newTopic);
+    await this.saveTopics(data.topics);
+    return newTopic;
+  }
+
+  async updateTopic(topic) {
+    const data = this.cache;
+    if (!Array.isArray(data.topics)) return false;
+    const idx = data.topics.findIndex(t => t.id === topic.id);
+    if (idx !== -1) {
+      data.topics[idx] = { ...data.topics[idx], ...topic };
+      await this.saveTopics(data.topics);
+      return true;
+    }
+    return false;
+  }
+
+  async deleteTopic(id) {
+    const data = this.cache;
+    if (!Array.isArray(data.topics)) return false;
+    data.topics = data.topics.filter(t => t.id !== id);
+    await this.saveTopics(data.topics);
+    return true;
+  }
+
+  async toggleTopicStatus(id) {
+    const data = this.cache;
+    if (!Array.isArray(data.topics)) return false;
+    const topic = data.topics.find(t => t.id === id);
+    if (topic) {
+      if (topic.status === 'To Do') topic.status = 'In Progress';
+      else if (topic.status === 'In Progress') topic.status = 'Mastered';
+      else topic.status = 'To Do';
+      await this.saveTopics(data.topics);
+      return topic.status;
+    }
+    return null;
+  }
+
+  async saveLeetCode(leetcodeData) {
+    const data = this.cache;
+    data.leetcode = leetcodeData;
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/leetcode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leetcode: leetcodeData })
+      });
+    } catch (e) {}
+    return true;
+  }
+
+  async addLeetCodeProblem(problem) {
+    const data = this.cache;
+    if (!data.leetcode) data.leetcode = { goals: {}, problems: [] };
+    if (!Array.isArray(data.leetcode.problems)) data.leetcode.problems = [];
+
+    const newProblem = {
+      id: problem.id || ('lc-' + Date.now()),
+      number: Number(problem.number) || (data.leetcode.problems.length + 1),
+      title: problem.title || 'Untitled Problem',
+      difficulty: problem.difficulty || 'Medium',
+      topic: problem.topic || 'Algorithms',
+      date: problem.date || new Date().toISOString().split('T')[0],
+      timeMinutes: Number(problem.timeMinutes) || 20,
+      url: problem.url || '#',
+      approach: problem.approach || ''
+    };
+
+    data.leetcode.problems.unshift(newProblem);
+    await this.saveLeetCode(data.leetcode);
+    return newProblem;
+  }
+
+  async updateLeetCodeProblem(problem) {
+    const data = this.cache;
+    if (!data.leetcode || !Array.isArray(data.leetcode.problems)) return false;
+    const idx = data.leetcode.problems.findIndex(p => p.id === problem.id);
+    if (idx !== -1) {
+      data.leetcode.problems[idx] = { ...data.leetcode.problems[idx], ...problem };
+      await this.saveLeetCode(data.leetcode);
+      return true;
+    }
+    return false;
+  }
+
+  async deleteLeetCodeProblem(id) {
+    const data = this.cache;
+    if (!data.leetcode || !Array.isArray(data.leetcode.problems)) return false;
+    data.leetcode.problems = data.leetcode.problems.filter(p => p.id !== id);
+    await this.saveLeetCode(data.leetcode);
+    return true;
+  }
+
+  async saveProfile(profileData) {
+    const data = this.cache;
+    data.profile = { ...data.profile, ...profileData };
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile: data.profile })
+      });
+    } catch (e) {}
+    return true;
+  }
+
+  async updateMessageStatus(id, newStatus) {
+    const data = this.cache;
+    const msg = data.messages.find(m => m.id === id);
+    if (msg) {
+      msg.status = newStatus;
+      this.saveLocal(data);
+    }
+
+    try {
+      await fetch(`${this.serverUrl}/api/messages/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'status', status: newStatus })
+      });
+    } catch (e) {}
+  }
+
+  async deleteMessage(id) {
+    const data = this.cache;
+    data.messages = data.messages.filter(m => m.id !== id);
+    this.saveLocal(data);
+
+    try {
+      await fetch(`${this.serverUrl}/api/messages/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'delete' })
+      });
+    } catch (e) {}
+  }
+
+  async resetToDefaults() {
+    this.saveLocal(JSON.parse(JSON.stringify(DEFAULT_STATE)));
+    try {
+      await fetch(`${this.serverUrl}/api/reset`, { method: 'POST' });
+    } catch (e) {}
+    return this.cache;
+  }
+
+  /**
+   * High-Performance LeetCode Analytics Engine
+   * Aggregates solved problems per day, per week, and per month,
+   * calculating streaks, difficulty splits, and temporal chart series.
+   */
+  getLeetCodeAnalytics() {
+    const problems = (this.cache.leetcode && Array.isArray(this.cache.leetcode.problems)) 
+      ? this.cache.leetcode.problems 
+      : [];
+    const goals = (this.cache.leetcode && this.cache.leetcode.goals) 
+      ? this.cache.leetcode.goals 
+      : { targetPerDay: 2, targetPerWeek: 14, targetPerMonth: 50, totalTarget: 300 };
+
+    // Reference Date: Use latest problem date or current ISO date
+    const todayStr = problems.length > 0 ? problems[0].date : new Date().toISOString().split('T')[0];
+    const todayObj = new Date(todayStr);
+
+    // 1. Solved Today
+    const solvedTodayList = problems.filter(p => p.date === todayStr);
+    const solvedToday = solvedTodayList.length;
+
+    // 2. Solved This Week (Current 7-day rolling or Monday-Sunday)
+    // Rolling 7 days from reference date:
+    const weekStartObj = new Date(todayObj);
+    weekStartObj.setDate(weekStartObj.getDate() - 6);
+    const weekStartStr = weekStartObj.toISOString().split('T')[0];
+    const solvedThisWeekList = problems.filter(p => p.date >= weekStartStr && p.date <= todayStr);
+    const solvedThisWeek = solvedThisWeekList.length;
+
+    // 3. Solved This Month
+    const currentYearMonth = todayStr.substring(0, 7); // e.g. "2026-10"
+    const solvedThisMonthList = problems.filter(p => p.date && p.date.startsWith(currentYearMonth));
+    const solvedThisMonth = solvedThisMonthList.length;
+
+    // 4. Total Solved & Difficulty Counts
+    const byDifficulty = { Easy: 0, Medium: 0, Hard: 0 };
+    const byTopic = {};
+    let totalMinutes = 0;
+
+    problems.forEach(p => {
+      const diff = p.difficulty || 'Medium';
+      if (byDifficulty[diff] !== undefined) byDifficulty[diff]++;
+      else byDifficulty[diff] = 1;
+
+      const top = p.topic || 'Algorithms';
+      byTopic[top] = (byTopic[top] || 0) + 1;
+
+      if (p.timeMinutes) totalMinutes += Number(p.timeMinutes);
+    });
+
+    const avgMinutes = problems.length > 0 ? Math.round(totalMinutes / problems.length) : 0;
+
+    // 5. Current Streak Calculation (consecutive days)
+    const datesSet = new Set(problems.map(p => p.date).filter(Boolean));
+    let streak = 0;
+    let checkDate = new Date(todayObj);
+
+    while (true) {
+      const dStr = checkDate.toISOString().split('T')[0];
+      if (datesSet.has(dStr)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    // 6. Per Day Activity (Last 14 days)
+    const dailyActivity = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(todayObj);
+      d.setDate(d.getDate() - i);
+      const dStr = d.toISOString().split('T')[0];
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const label = `${monthNames[d.getMonth()]} ${d.getDate()}`;
+      
+      const dayProbs = problems.filter(p => p.date === dStr);
+      dailyActivity.push({
+        date: dStr,
+        label: label,
+        count: dayProbs.length,
+        easy: dayProbs.filter(p => p.difficulty === 'Easy').length,
+        medium: dayProbs.filter(p => p.difficulty === 'Medium').length,
+        hard: dayProbs.filter(p => p.difficulty === 'Hard').length
+      });
+    }
+
+    // 7. Per Week Activity (Last 6 weeks)
+    const weeklyActivity = [];
+    for (let w = 5; w >= 0; w--) {
+      const startW = new Date(todayObj);
+      startW.setDate(startW.getDate() - (w * 7 + 6));
+      const endW = new Date(todayObj);
+      endW.setDate(endW.getDate() - (w * 7));
+
+      const sStr = startW.toISOString().split('T')[0];
+      const eStr = endW.toISOString().split('T')[0];
+
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const weekLabel = `${monthNames[startW.getMonth()]} ${startW.getDate()} - ${monthNames[endW.getMonth()]} ${endW.getDate()}`;
+
+      const weekProbs = problems.filter(p => p.date >= sStr && p.date <= eStr);
+      weeklyActivity.push({
+        label: (w === 0) ? 'This Week' : (w === 1 ? 'Last Week' : `Week -${w}`),
+        dateRange: weekLabel,
+        count: weekProbs.length,
+        easy: weekProbs.filter(p => p.difficulty === 'Easy').length,
+        medium: weekProbs.filter(p => p.difficulty === 'Medium').length,
+        hard: weekProbs.filter(p => p.difficulty === 'Hard').length
+      });
+    }
+
+    // 8. Per Month Activity (Last 4 months)
+    const monthlyActivity = [];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    for (let m = 3; m >= 0; m--) {
+      const mDate = new Date(todayObj.getFullYear(), todayObj.getMonth() - m, 1);
+      const y = mDate.getFullYear();
+      const mon = String(mDate.getMonth() + 1).padStart(2, '0');
+      const ymStr = `${y}-${mon}`;
+      const mLabel = `${monthNames[mDate.getMonth()]} ${y}`;
+
+      const mProbs = problems.filter(p => p.date && p.date.startsWith(ymStr));
+      monthlyActivity.push({
+        monthKey: ymStr,
+        label: mLabel,
+        count: mProbs.length,
+        easy: mProbs.filter(p => p.difficulty === 'Easy').length,
+        medium: mProbs.filter(p => p.difficulty === 'Medium').length,
+        hard: mProbs.filter(p => p.difficulty === 'Hard').length
+      });
+    }
+
+    return {
+      totalSolved: problems.length,
+      solvedToday,
+      solvedThisWeek,
+      solvedThisMonth,
+      currentStreak: streak,
+      avgMinutes,
+      byDifficulty,
+      byTopic,
+      dailyActivity,
+      weeklyActivity,
+      monthlyActivity,
+      goals
+    };
+  }
+}
+
+// Global Singleton Instance
+window.portfolioStore = new PortfolioStore();

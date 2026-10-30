@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ravi Ardhana - Web Developer & Competitive Programmer</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23a855f7'/><text y='65' font-size='50' x='50' text-anchor='middle' fill='white'>R</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000021; }
+        ::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 4px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000021;
+            color: #e5e7eb;
+        }
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .firstSection {
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 4rem;
+        }
+        .hero-text-container {
+            position: relative;
+        }
+        .hero-text-container::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -30px;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #6b21a8, #a855f7, #6b21a8);
+            border-radius: 2px;
+            opacity: 0.5;
+            box-shadow: 0 0 10px #a855f7;
+        }
+        .skill-card {
+            transition: all 0.3s ease-in-out;
+            border: 1px solid #1f2937;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .skill-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #a855f7;
+            box-shadow: 0 8px 16px rgba(168, 85, 247, 0.3);
+        }
+        @media (max-width: 768px) {
+            .firstSection {
+                flex-direction: column;
+                padding-top: 3rem;
+            }
+            .leftSection {
+                order: 2;
+                width: 100% !important;
+                text-align: center;
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="selection:bg-purple-900 selection:text-white">
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-[#12123e]/90 border-b border-gray-800">
+        <nav class="container mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="left text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+                <span class="w-3 h-3 rounded-full bg-[#a855f7] inline-block shadow-lg shadow-purple-500"></span>
+                <span id="navBrandName">Ravi Ardhana</span>
+            </div>
+            <div class="right flex items-center space-x-6 md:space-x-8">
+                <ul class="flex space-x-4 md:space-x-8 text-sm md:text-base font-medium">
+                    <li><a href="#home" class="text-white hover:text-[#a855f7] transition duration-200">Home</a></li>
+                    <li><a href="#about" class="text-white hover:text-[#a855f7] transition duration-200">About</a></li>
+                    <li><a href="#skills" class="text-white hover:text-[#a855f7] transition duration-200">Skills</a></li>
+                    <li><a href="#roadmap" class="text-white hover:text-[#a855f7] transition duration-200">Roadmap</a></li>
+                    <li><a href="#projects" class="text-white hover:text-[#a855f7] transition duration-200">Projects</a></li>
+                    <li><a href="#leetcode" class="text-white hover:text-[#a855f7] transition duration-200">LeetCode</a></li>
+                    <li><a href="#contact" class="text-white hover:text-[#a855f7] transition duration-200">Contact</a></li>
+                </ul>
+
+                <!-- Direct link to Dynamic Admin Dashboard -->
+                <a href="dashboard.html" title="Open Dynamic Management Dashboard" class="hidden sm:inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg border border-[#a855f7]/50 bg-purple-950/40 text-[#c084fc] hover:bg-[#a855f7] hover:text-white transition duration-200 text-xs md:text-sm font-semibold shadow-sm">
+                    <span>Dynamic Dashboard</span>
+                    <span>⚙️</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 md:px-8">
+        <!-- Hero Section -->
+        <section id="home" class="firstSection flex flex-wrap justify-around items-center pt-16 pb-12 min-h-[75vh]">
+            <div class="leftSection w-full md:w-4/5 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight hero-text-container mx-auto">
+                <p class="hero-intro text-gray-300 text-2xl md:text-3xl font-normal mb-2">Hello, I'm</p>
+                <span class="hero-name text-white block">Ravi Ardhana</span>
+                <p class="text-2xl md:text-3xl text-gray-400 font-medium mt-4">
+                    <span class="hero-headline">A Passionate </span><span id="element" class="text-[#a855f7]"></span>
+                </p>
+
+                <!-- Live Solves & Target Goal Strip -->
+                <div class="mt-6 flex flex-wrap items-center gap-3 text-xs md:text-sm">
+                    <span class="px-3.5 py-1.5 rounded-full bg-green-950/70 border border-green-800/60 text-green-300 font-bold flex items-center space-x-1.5" id="heroLeetCodePill">
+                        <span>💻</span>
+                        <span id="heroLeetCodeText">165+ LeetCode Solved</span>
+                    </span>
+                    <span class="px-3.5 py-1.5 rounded-full bg-orange-950/60 border border-orange-800/50 text-orange-300 font-semibold flex items-center space-x-1.5" id="heroStreakPill">
+                        <span>🔥</span>
+                        <span id="heroStreakText">14-Day Active Streak</span>
+                    </span>
+                    <span class="px-3.5 py-1.5 rounded-full bg-purple-950/60 border border-purple-800/50 text-purple-300 font-medium" id="heroTargetGoalText">
+                        Target: 300+ Problems & Full-Stack Mastery
+                    </span>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="mt-10 flex flex-wrap gap-4">
+                    <a href="#contact" class="px-7 py-3.5 bg-[#a855f7] text-white font-semibold rounded-lg shadow-lg shadow-purple-900/50 hover:bg-purple-600 transition duration-300 flex items-center space-x-2">
+                        <span>Get In Touch</span>
+                        <span>✉️</span>
+                    </a>
+                    <a id="viewResumeBtn" href="#" class="px-7 py-3.5 border border-gray-600 text-gray-300 font-semibold rounded-lg hover:border-[#a855f7] hover:text-[#a855f7] transition duration-300 flex items-center space-x-2">
+                        <span>View Resume</span>
+                        <span>📄</span>
+                    </a>
+                    <a href="dashboard.html" class="px-5 py-3.5 bg-[#12123e] border border-gray-700 text-purple-300 hover:text-white hover:border-[#a855f7] rounded-lg text-sm font-semibold transition duration-300 flex items-center space-x-2">
+                        <span>Dynamic Dashboard</span>
+                        <span>📊</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section (Bio) -->
+        <section id="about" class="py-16 md:py-24">
+            <h2 class="text-center text-4xl md:text-5xl font-bold mb-4 text-[#a855f7]">About Me</h2>
+            <p class="text-center text-gray-400 mb-12 text-lg">My engineering background, problem-solving journey, and technical focus.</p>
+            
+            <div class="bg-[#12123e] p-8 md:p-12 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-gray-800">
+                <p id="aboutBioText" class="text-lg md:text-xl leading-relaxed text-gray-300">
+                    I am a dedicated and results-driven software developer with a strong foundation in modern web engineering, algorithms, and system programming.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-6 border-t border-gray-800/80">
+                    <div class="bg-[#000021]/60 p-4 rounded-xl border border-gray-800">
+                        <span class="text-purple-400 font-semibold block text-sm uppercase tracking-wider mb-1">Frontend Engineering</span>
+                        <p class="text-gray-300 text-sm">HTML5, CSS3, JavaScript ES6+, Tailwind CSS & responsive UI architecture</p>
+                    </div>
+                    <div class="bg-[#000021]/60 p-4 rounded-xl border border-gray-800">
+                        <span class="text-purple-400 font-semibold block text-sm uppercase tracking-wider mb-1">Backend & Systems</span>
+                        <p class="text-gray-300 text-sm">Python, C Programming, SQLite / Relational DBs & REST APIs</p>
+                    </div>
+                    <div class="bg-[#000021]/60 p-4 rounded-xl border border-gray-800">
+                        <span class="text-purple-400 font-semibold block text-sm uppercase tracking-wider mb-1">Algorithmic Mastery</span>
+                        <p class="text-gray-300 text-sm">Data structures, dynamic programming, daily LeetCode solve routines</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-gray-400 gap-3">
+                    <span>✨ Always open for software engineering internships, collaborative projects, and roles.</span>
+                    <a href="#contact" class="text-[#a855f7] hover:underline font-semibold">Let's connect →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Skills Section (With How Long it Took to Learn) -->
+        <section id="skills" class="py-16 md:py-24 border-t border-gray-900">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end max-w-6xl mx-auto mb-10 gap-4 px-2">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold text-[#a855f7]">Technical Skills</h2>
+                    <p class="text-gray-400 mt-2 text-base md:text-lg">Proficiency meter and the exact time invested to master each technology.</p>
+                </div>
+                <a href="dashboard.html#skills-tab" class="text-xs md:text-sm text-purple-400 hover:text-white flex items-center space-x-1 border border-purple-900/60 bg-purple-950/30 px-3 py-1.5 rounded-lg transition">
+                    <span>Manage Skills in Dashboard</span>
+                    <span>⚙️</span>
+                </a>
+            </div>
+            
+            <div id="skillsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <!-- Dynamically populated via portfolio.js -->
+            </div>
+        </section>
+
+        <!-- Roadmap & To-Do Concepts Section (Related to Skills) -->
+        <section id="roadmap" class="py-16 md:py-24 border-t border-gray-900">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end max-w-6xl mx-auto mb-10 gap-4 px-2">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🎯</span>
+                        <h2 class="text-3xl md:text-5xl font-bold text-amber-400">Roadmap: Concepts to Cover Soon</h2>
+                    </div>
+                    <p class="text-gray-400 mt-2 text-base md:text-lg">Topics and architectural patterns currently queued to deepen technical skill mastery.</p>
+                </div>
+                <a href="dashboard.html#topics-tab" class="text-xs md:text-sm text-amber-400 hover:text-white flex items-center space-x-1 border border-amber-900/60 bg-amber-950/30 px-3 py-1.5 rounded-lg transition">
+                    <span>Manage Roadmap in Dashboard</span>
+                    <span>⚙️</span>
+                </a>
+            </div>
+
+            <div id="roadmapContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                <!-- Dynamically populated via portfolio.js -->
+            </div>
+        </section>
+
+        <!-- Projects Section (With Milestones & How Long it Took to Complete) -->
+        <section id="projects" class="py-16 md:py-24 border-t border-gray-900">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end max-w-6xl mx-auto mb-10 gap-4 px-2">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold text-[#a855f7]">Featured Projects</h2>
+                    <p class="text-gray-400 mt-2 text-base md:text-lg">Applications and software builds with detailed completion timelines.</p>
+                </div>
+                <div id="projectFilterContainer" class="flex flex-wrap gap-2">
+                    <!-- Dynamic Category Filter Buttons -->
+                </div>
+            </div>
+
+            <div id="projectsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <!-- Dynamically populated via portfolio.js -->
+            </div>
+        </section>
+
+        <!-- LeetCode Problem Solving Showcase Section (Daily, Weekly, Monthly) -->
+        <section id="leetcode" class="py-16 md:py-24 border-t border-gray-900">
+            <div class="max-w-6xl mx-auto px-2">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-green-400"></span>
+                            <h2 class="text-3xl md:text-5xl font-bold text-green-400">Competitive Coding & LeetCode</h2>
+                        </div>
+                        <p class="text-gray-400 mt-2 text-base md:text-lg">Daily algorithmic challenge cadence across days, weeks, and months.</p>
+                    </div>
+                    <a href="dashboard.html#leetcode-tab" class="text-xs md:text-sm text-green-400 hover:text-white flex items-center space-x-1 border border-green-900/60 bg-green-950/30 px-3 py-1.5 rounded-lg transition font-medium">
+                        <span>Open LeetCode Analytics Hub</span>
+                        <span>📊</span>
+                    </a>
+                </div>
+
+                <!-- LeetCode Stats Banner -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                    <div class="bg-[#12123e] p-5 rounded-2xl border border-gray-800 text-center">
+                        <span class="text-xs text-green-400 block font-semibold uppercase">Solved Today</span>
+                        <span id="publicLcToday" class="text-3xl font-black text-white mt-1 block">3</span>
+                        <span class="text-[11px] text-gray-500">Per Day Metric</span>
+                    </div>
+
+                    <div class="bg-[#12123e] p-5 rounded-2xl border border-gray-800 text-center">
+                        <span class="text-xs text-yellow-400 block font-semibold uppercase">This Week</span>
+                        <span id="publicLcWeek" class="text-3xl font-black text-white mt-1 block">18</span>
+                        <span class="text-[11px] text-gray-500">Per Week Metric</span>
+                    </div>
+
+                    <div class="bg-[#12123e] p-5 rounded-2xl border border-gray-800 text-center">
+                        <span class="text-xs text-purple-400 block font-semibold uppercase">This Month</span>
+                        <span id="publicLcMonth" class="text-3xl font-black text-white mt-1 block">64</span>
+                        <span class="text-[11px] text-gray-500">Per Month Metric</span>
+                    </div>
+
+                    <div class="bg-[#12123e] p-5 rounded-2xl border border-gray-800 text-center">
+                        <span class="text-xs text-blue-400 block font-semibold uppercase">Total Solved</span>
+                        <span id="publicLcTotal" class="text-3xl font-black text-white mt-1 block">165</span>
+                        <span class="text-[11px] text-gray-500">Target: 300</span>
+                    </div>
+
+                    <div class="bg-[#12123e] p-5 rounded-2xl border border-gray-800 text-center col-span-2 sm:col-span-1">
+                        <span class="text-xs text-orange-400 block font-semibold uppercase">Active Streak</span>
+                        <span id="publicLcStreak" class="text-3xl font-black text-orange-400 mt-1 block">🔥 14</span>
+                        <span class="text-[11px] text-gray-500">Consecutive Days</span>
+                    </div>
+                </div>
+
+                <!-- Difficulty Breakdown Bar & Recent Solves -->
+                <div class="bg-[#12123e] p-6 rounded-2xl border border-gray-800 space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-2">
+                            <span class="font-bold text-white uppercase tracking-wider">Difficulty Distribution</span>
+                            <div class="flex space-x-4 font-mono-code">
+                                <span class="text-green-400 font-semibold" id="publicLcEasyPct">Easy: 42%</span>
+                                <span class="text-amber-400 font-semibold" id="publicLcMedPct">Medium: 48%</span>
+                                <span class="text-red-400 font-semibold" id="publicLcHardPct">Hard: 10%</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-[#000021] rounded-full h-3 overflow-hidden flex border border-gray-800" id="publicLcBarSplit">
+                            <div class="bg-green-500 h-3" style="width: 42%" title="Easy"></div>
+                            <div class="bg-amber-500 h-3" style="width: 48%" title="Medium"></div>
+                            <div class="bg-red-500 h-3" style="width: 10%" title="Hard"></div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Highlights Strip -->
+                    <div class="pt-4 border-t border-gray-800/80">
+                        <h4 class="text-sm font-bold text-white mb-3">Latest Solved Challenges</h4>
+                        <div id="publicRecentLcSolves" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section with Dynamic Form & Links -->
+        <section id="contact" class="py-16 md:py-24 border-t border-gray-900">
+            <h2 class="text-center text-4xl md:text-5xl font-bold mb-4 text-[#a855f7]">Get In Touch</h2>
+            <p class="text-center text-gray-400 mb-12 text-lg">Send me a direct message or connect through my socials.</p>
+            
+            <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Contact Links Column -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-[#12123e] p-6 rounded-2xl border border-gray-800">
+                        <h3 class="text-xl font-bold text-white mb-4">Direct Coordinates</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4 p-3 bg-[#000021] rounded-xl border border-gray-700/60 hover:border-[#a855f7] transition duration-300">
+                                <span class="text-2xl" role="img" aria-label="Email">✉️</span>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs text-gray-400 uppercase tracking-wider">Email Address</p>
+                                    <a id="contactEmail" href="mailto:ravi.ardhana01@gmail.com" class="text-white text-sm font-medium hover:text-[#a855f7] truncate block">
+                                        ravi.ardhana01@gmail.com
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-4 p-3 bg-[#000021] rounded-xl border border-gray-700/60 hover:border-[#a855f7] transition duration-300">
+                                <span class="text-2xl" role="img" aria-label="Instagram">📸</span>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase tracking-wider">Instagram</p>
+                                    <a id="contactInstagram" href="https://www.instagram.com/ravidevelops" target="_blank" class="text-white text-sm font-medium hover:text-[#a855f7]">
+                                        @ravi.ardhana.1
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-4 p-3 bg-[#000021] rounded-xl border border-gray-700/60 hover:border-[#a855f7] transition duration-300">
+                                <span class="text-2xl" role="img" aria-label="Phone">📞</span>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase tracking-wider">Phone / WhatsApp</p>
+                                    <span id="contactPhone" class="text-white text-sm font-medium">
+                                        +91 88240 08948
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-gray-800 text-xs text-gray-400">
+                            ⚡ Messages submitted here appear instantly in the real-time admin inbox!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Contact Form -->
+                <div class="lg:col-span-7 bg-[#12123e] p-8 rounded-2xl border border-gray-800 shadow-2xl">
+                    <h3 class="text-2xl font-bold text-white mb-2">Send a Message</h3>
+                    <p class="text-sm text-gray-400 mb-6">Have an internship offer, freelance project, or question? Drop a note below.</p>
+
+                    <form id="contactForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="formName" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Your Name</label>
+                                <input type="text" id="formName" required placeholder="John Doe" class="w-full bg-[#000021] border border-gray-700 focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7] rounded-lg px-4 py-2.5 text-white text-sm outline-none transition">
+                            </div>
+                            <div>
+                                <label for="formEmail" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Your Email</label>
+                                <input type="email" id="formEmail" required placeholder="john@example.com" class="w-full bg-[#000021] border border-gray-700 focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7] rounded-lg px-4 py-2.5 text-white text-sm outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="formSubject" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Subject</label>
+                            <input type="text" id="formSubject" required placeholder="Frontend Developer Opportunity" class="w-full bg-[#000021] border border-gray-700 focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7] rounded-lg px-4 py-2.5 text-white text-sm outline-none transition">
+                        </div>
+
+                        <div>
+                            <label for="formMessage" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Message</label>
+                            <textarea id="formMessage" rows="4" required placeholder="Hi Ravi, I'd like to collaborate with you on..." class="w-full bg-[#000021] border border-gray-700 focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7] rounded-lg px-4 py-2.5 text-white text-sm outline-none transition resize-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3.5 bg-[#a855f7] hover:bg-purple-600 text-white font-semibold rounded-lg shadow-lg shadow-purple-900/50 transition duration-300 flex items-center justify-center space-x-2">
+                            <span>Deliver Message to Dashboard</span>
+                            <span>🚀</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#12123e] border-t border-gray-800 text-gray-400 py-8 mt-20">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm gap-4">
+            <p id="footerCopyright">&copy; 2026 Ravi Ardhana. All rights reserved. | Built with Passion & Dynamic Dashboard.</p>
+            <div class="flex items-center space-x-6">
+                <a href="#home" class="hover:text-[#a855f7] transition">Back to Top ↑</a>
+                <a href="dashboard.html" class="text-purple-400 hover:text-white transition font-medium flex items-center space-x-1">
+                    <span>Admin Dashboard</span>
+                    <span>↗</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App Scripts -->
+    <script src="js/app-storage.js"></script>
+    <script src="js/portfolio.js"></script>
+</body>
+</html>
