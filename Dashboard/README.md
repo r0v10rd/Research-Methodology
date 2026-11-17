@@ -1,5 +1,7 @@
 # 🚀 Ravi Ardhana - Dynamic Developer Portfolio & Analytics Dashboard
 
+
+!!Note- this website being dynamic cannot be hosted from github!!
 A modern, high-performance developer portfolio website and dynamic management dashboard. Built with Tailwind CSS, Chart.js, Typed.js, and a zero-dependency Python SQLite backend (with automatic browser LocalStorage fallback).
 
 ---
