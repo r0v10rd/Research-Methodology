@@ -1,4 +1,5 @@
 # 🚀 Ravi Ardhana - Dynamic Developer Portfolio & Analytics Dashboard
+!!Note: Github Pages do not support hosting dynamic website, so these files must be downloaded in the local pc!!
 
 
 !!Note- this website being dynamic cannot be hosted from github!!
@@ -82,7 +83,7 @@ ravi-portfolio-dashboard/
 1. Open PowerShell or Terminal.
 2. Navigate to the project directory:
    ```powershell
-   cd "C:\Users\ACER\.gemini\antigravity\scratch\ravi-portfolio-dashboard"
+   cd "//location of server.py//"
    ```
 3. Start the server (uses Python standard library, zero `pip` packages required):
    ```powershell
